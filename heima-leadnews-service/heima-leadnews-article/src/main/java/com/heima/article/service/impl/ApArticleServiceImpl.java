@@ -2,6 +2,7 @@ package com.heima.article.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.heima.aliyunOSS.service.AliOssService;
 import com.heima.article.mapper.ApArticleMapper;
 import com.heima.article.service.ApArticleService;
 import com.heima.common.constants.ArticleConstants;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +28,9 @@ public class ApArticleServiceImpl implements ApArticleService {
     private static final int PAGE_MAX_SIZE = 50;
     @Autowired
     private ApArticleMapper apArticleMapper;
+
+    @Autowired
+    private AliOssService aliOssService;
 
     @Override
     public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto) {
@@ -57,6 +62,7 @@ public class ApArticleServiceImpl implements ApArticleService {
         PageHelper.startPage(0,articleHomeDto.getSize());
         Page<ApArticle> apArticlePage = apArticleMapper.pageQueryApArticle(type, articleHomeDto);
         log.info("查询到{}条数据！", apArticlePage.getTotal());
+
         return apArticlePage.getResult();
     }
 }

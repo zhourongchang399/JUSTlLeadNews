@@ -3,6 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.article.mapper.ApArticleMapper">
 
+    <update id="updateById">
+        update ap_article
+        <set>
+            <if test="staticUrl != null">
+                static_url = #{staticUrl},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
     <select id="pageQueryApArticle" resultType="com.heima.model.article.pojos.ApArticle">
         select ap_article.* from ap_article LEFT JOIN ap_article_config ON ap_article.id = ap_article_config.article_id
         <where>

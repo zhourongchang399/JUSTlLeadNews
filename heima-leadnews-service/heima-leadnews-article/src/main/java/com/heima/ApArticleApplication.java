@@ -12,6 +12,7 @@ public class ApArticleApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ApArticleApplication.class, args);
+        System.out.println("abc");
     }
 
 }
