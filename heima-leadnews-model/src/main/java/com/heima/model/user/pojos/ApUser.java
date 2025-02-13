@@ -1,9 +1,9 @@
 package com.heima.model.user.pojos;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+//import com.baomidou.mybatisplus.annotation.IdType;
+//import com.baomidou.mybatisplus.annotation.TableField;
+//import com.baomidou.mybatisplus.annotation.TableId;
+//import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @author itheima
  */
 @Data
-@TableName("ap_user")
+//@TableName("ap_user")
 public class ApUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,37 +25,37 @@ public class ApUser implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
+//    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
      * 密码、通信等加密盐
      */
-    @TableField("salt")
+//    @TableField("salt")
     private String salt;
 
     /**
      * 用户名
      */
-    @TableField("name")
+//    @TableField("name")
     private String name;
 
     /**
      * 密码,md5加密
      */
-    @TableField("password")
+//    @TableField("password")
     private String password;
 
     /**
      * 手机号
      */
-    @TableField("phone")
+//    @TableField("phone")
     private String phone;
 
     /**
      * 头像
      */
-    @TableField("image")
+//    @TableField("image")
     private String image;
 
     /**
@@ -63,27 +63,27 @@ public class ApUser implements Serializable {
             1 女
             2 未知
      */
-    @TableField("sex")
+//    @TableField("sex")
     private Boolean sex;
 
     /**
      * 0 未
             1 是
      */
-    @TableField("is_certification")
+//    @TableField("is_certification")
     private Boolean certification;
 
     /**
      * 是否身份认证
      */
-    @TableField("is_identity_authentication")
+//    @TableField("is_identity_authentication")
     private Boolean identityAuthentication;
 
     /**
      * 0正常
             1锁定
      */
-    @TableField("status")
+//    @TableField("status")
     private Boolean status;
 
     /**
@@ -91,13 +91,13 @@ public class ApUser implements Serializable {
             1 自媒体人
             2 大V
      */
-    @TableField("flag")
+//    @TableField("flag")
     private Short flag;
 
     /**
      * 注册时间
      */
-    @TableField("created_time")
+//    @TableField("created_time")
     private Date createdTime;
 
 }

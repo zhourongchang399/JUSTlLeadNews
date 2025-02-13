@@ -1,7 +1,7 @@
 package com.heima.user.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+//import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+//import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.user.dtos.LoginDto;
@@ -11,6 +11,7 @@ import com.heima.user.service.ApUserService;
 import com.heima.utils.common.AppJwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -22,7 +23,11 @@ import java.util.Map;
 @Service
 @Transactional
 @Slf4j
-public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> implements ApUserService {
+public class ApUserServiceImpl implements ApUserService {
+
+    @Autowired
+    private ApUserMapper apUserMapper;
+
     /**
      * app端登录功能
      * @param dto
@@ -33,7 +38,9 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
         //1.正常登录 用户名和密码
         if(StringUtils.isNotBlank(dto.getPhone()) && StringUtils.isNotBlank(dto.getPassword())){
             //1.1 根据手机号查询用户信息
-            ApUser dbUser = getOne(Wrappers.<ApUser>lambdaQuery().eq(ApUser::getPhone, dto.getPhone()));
+            ApUser queryDbUser = new ApUser();
+            queryDbUser.setPhone(dto.getPhone());
+            ApUser dbUser = apUserMapper.getByConditions(queryDbUser);
             if(dbUser == null){
                 return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST,"用户信息不存在");
             }

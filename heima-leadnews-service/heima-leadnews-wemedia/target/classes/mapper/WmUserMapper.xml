@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.wemedia.mapper.WmUserMapper">
+
+    <select id="getByCondition" resultType="com.heima.model.wemedia.pojos.WmUser">
+        select * from wm_user
+        <where>
+            <if test="name != null">
+                and name = #{name}
+            </if>
+            <if test="password != null">
+                and password = #{password}
+            </if>
+        </where>
+    </select>
+
+</mapper>

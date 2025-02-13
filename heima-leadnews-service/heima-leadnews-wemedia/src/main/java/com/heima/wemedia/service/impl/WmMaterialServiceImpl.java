@@ -1,13 +1,19 @@
 package com.heima.wemedia.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.heima.aliyunOSS.service.AliOssService;
 import com.heima.common.exception.CustomException;
+import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.wemedia.dtos.WmMaterialDto;
 import com.heima.model.wemedia.pojos.WmMaterial;
 import com.heima.utils.common.WmThreadLocalUtil;
 import com.heima.wemedia.mapper.WmMaterialMapper;
 import com.heima.wemedia.service.WmMaterialService;
+import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +28,7 @@ import java.util.UUID;
  * @date ：2025/2/13 15:53
  */
 @Service
+@Slf4j
 public class WmMaterialServiceImpl implements WmMaterialService {
 
     @Autowired
@@ -35,6 +42,8 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     final static short PICTURE = 0;
     final static short VIDEO = 1;
     final static String ROUTE = "weMedia/picture/";
+    final static Integer FIRST_PAGE = 1;
+    final static Integer PAGE_SIZE = 20;
 
     @Override
     public ResponseResult uploadMaterial(MultipartFile file) {
@@ -68,5 +77,33 @@ public class WmMaterialServiceImpl implements WmMaterialService {
 
         // 返回结果
         return ResponseResult.okResult(wmMaterial);
+    }
+
+    @Override
+    public ResponseResult getMaterialList(WmMaterialDto wmMaterialDto) {
+        // 校验参数
+        if (wmMaterialDto.getPage() == null || wmMaterialDto.getPage() < 1) {
+            wmMaterialDto.setPage(FIRST_PAGE);
+        }
+        if (wmMaterialDto.getSize() == null || wmMaterialDto.getSize() < 1) {
+            wmMaterialDto.setSize(PAGE_SIZE);
+        }
+
+        // 开始分页
+        PageHelper.startPage(wmMaterialDto.getPage(), wmMaterialDto.getSize());
+
+        // 查询数据库
+        Page<WmMaterial> wmMaterialPage = wmMaterialMapper.listQuery(wmMaterialDto);
+
+        // 输出查询结果的总数
+        log.info("total: {}", wmMaterialPage.getTotal());
+
+        // 封装分页结果
+        PageResponseResult responseResult = new PageResponseResult(wmMaterialDto.getPage(), wmMaterialDto.getSize(), (int) wmMaterialPage.getTotal());
+        responseResult.setData(wmMaterialPage.getResult());  // 返回分页数据
+
+        // 返回成功结果
+        return PageResponseResult.okResult(responseResult);
+
     }
 }

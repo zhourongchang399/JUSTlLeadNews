@@ -1,9 +1,9 @@
 package com.heima.model.wemedia.pojos;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+//import com.baomidou.mybatisplus.annotation.IdType;
+//import com.baomidou.mybatisplus.annotation.TableField;
+//import com.baomidou.mybatisplus.annotation.TableId;
+//import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @author itheima
  */
 @Data
-@TableName("wm_user")
+//@TableName("wm_user")
 public class WmUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,55 +25,55 @@ public class WmUser implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
+//    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("ap_user_id")
+//    @TableField("ap_user_id")
     private Integer apUserId;
 
-    @TableField("ap_author_id")
+//    @TableField("ap_author_id")
     private Integer apAuthorId;
 
     /**
      * 登录用户名
      */
-    @TableField("name")
+//    @TableField("name")
     private String name;
 
     /**
      * 登录密码
      */
-    @TableField("password")
+//    @TableField("password")
     private String password;
 
     /**
      * 盐
      */
-    @TableField("salt")
+//    @TableField("salt")
     private String salt;
 
     /**
      * 昵称
      */
-    @TableField("nickname")
+//    @TableField("nickname")
     private String nickname;
 
     /**
      * 头像
      */
-    @TableField("image")
+//    @TableField("image")
     private String image;
 
     /**
      * 归属地
      */
-    @TableField("location")
+//    @TableField("location")
     private String location;
 
     /**
      * 手机号
      */
-    @TableField("phone")
+//    @TableField("phone")
     private String phone;
 
     /**
@@ -82,13 +82,13 @@ public class WmUser implements Serializable {
             1 永久不可用
             9 正常可用
      */
-    @TableField("status")
+//    @TableField("status")
     private Integer status;
 
     /**
      * 邮箱
      */
-    @TableField("email")
+//    @TableField("email")
     private String email;
 
     /**
@@ -97,25 +97,25 @@ public class WmUser implements Serializable {
             1 企业
             2 子账号
      */
-    @TableField("type")
+//    @TableField("type")
     private Integer type;
 
     /**
      * 运营评分
      */
-    @TableField("score")
+//    @TableField("score")
     private Integer score;
 
     /**
      * 最后一次登录时间
      */
-    @TableField("login_time")
+//    @TableField("login_time")
     private Date loginTime;
 
     /**
      * 创建时间
      */
-    @TableField("created_time")
+//    @TableField("created_time")
     private Date createdTime;
 
 }

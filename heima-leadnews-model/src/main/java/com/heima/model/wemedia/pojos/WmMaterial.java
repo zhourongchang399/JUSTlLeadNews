@@ -1,9 +1,9 @@
 package com.heima.model.wemedia.pojos;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+//import com.baomidou.mybatisplus.annotation.IdType;
+//import com.baomidou.mybatisplus.annotation.TableField;
+//import com.baomidou.mybatisplus.annotation.TableId;
+//import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @author itheima
  */
 @Data
-@TableName("wm_material")
+//@TableName("wm_material")
 public class WmMaterial implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,19 +25,19 @@ public class WmMaterial implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
+//    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
      * 自媒体用户ID
      */
-    @TableField("user_id")
+//    @TableField("user_id")
     private Long userId;
 
     /**
      * 图片地址
      */
-    @TableField("url")
+//    @TableField("url")
     private String url;
 
     /**
@@ -45,19 +45,19 @@ public class WmMaterial implements Serializable {
      0 图片
      1 视频
      */
-    @TableField("type")
+//    @TableField("type")
     private Short type;
 
     /**
      * 是否收藏
      */
-    @TableField("is_collection")
+//    @TableField("is_collection")
     private Short isCollection;
 
     /**
      * 创建时间
      */
-    @TableField("created_time")
+//    @TableField("created_time")
     private Date createdTime;
 
 }
