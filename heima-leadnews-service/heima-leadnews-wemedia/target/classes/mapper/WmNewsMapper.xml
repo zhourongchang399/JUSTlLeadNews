@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.wemedia.mapper.WmNewsMapper">
+    <select id="listByConditions" resultType="com.heima.model.wemedia.pojos.WmNews">
+        select * from wm_news
+        <where>
+            <if test="dto.keyword != null">
+                and title like concat("%", #{dto.keyword}, "%")
+            </if>
+            <if test="dto.channelId != null">
+                and channel_id = #{dto.channelId}
+            </if>
+            <if test="dto.status != null">
+                and status = #{dto.status}
+            </if>
+            <if test="dto.beginPubDate != null">
+                and created_time &gt;= #{dto.beginPubDate}
+            </if>
+            <if test="dto.endPubDate != null">
+                and created_time &lt;= #{dto.endPubDate}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+</mapper>

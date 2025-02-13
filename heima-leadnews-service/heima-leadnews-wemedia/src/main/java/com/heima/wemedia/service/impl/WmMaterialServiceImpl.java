@@ -89,11 +89,17 @@ public class WmMaterialServiceImpl implements WmMaterialService {
             wmMaterialDto.setSize(PAGE_SIZE);
         }
 
+        // 获取当前用户
+        Long id = WmThreadLocalUtil.getCurrentId();
+        if (id == null) {
+            throw new CustomException(AppHttpCodeEnum.NO_OPERATOR_AUTH);
+        }
+
         // 开始分页
         PageHelper.startPage(wmMaterialDto.getPage(), wmMaterialDto.getSize());
 
         // 查询数据库
-        Page<WmMaterial> wmMaterialPage = wmMaterialMapper.listQuery(wmMaterialDto);
+        Page<WmMaterial> wmMaterialPage = wmMaterialMapper.listQuery(id, wmMaterialDto);
 
         // 输出查询结果的总数
         log.info("total: {}", wmMaterialPage.getTotal());
