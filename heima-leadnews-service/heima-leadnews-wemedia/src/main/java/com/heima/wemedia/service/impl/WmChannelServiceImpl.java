@@ -15,7 +15,7 @@ import java.util.List;
  * @date ：2025/2/14 0:42
  */
 @Service
-public class WmChannelServiceImppl implements WmChannelService {
+public class WmChannelServiceImpl implements WmChannelService {
 
     @Autowired
     private WmChannelMapper wmChannelMapper;
