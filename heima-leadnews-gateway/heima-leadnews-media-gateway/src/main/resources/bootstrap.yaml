@@ -1,0 +1,12 @@
+server:
+  port: 51602
+spring:
+  application:
+    name: leadnews-media-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://47.97.17.151:8848
+      config:
+        server-addr: http://47.97.17.151:8848
+        file-extension: yml
