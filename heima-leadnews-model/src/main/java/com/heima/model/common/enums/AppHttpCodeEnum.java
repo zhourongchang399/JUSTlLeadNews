@@ -18,6 +18,7 @@ public enum AppHttpCodeEnum {
     PARAM_REQUIRE(500,"缺少参数"),
     PARAM_INVALID(501,"无效参数"),
     PARAM_IMAGE_FORMAT_ERROR(502,"图片格式有误"),
+    UPLOAD_FILE_ERROR(502, "上传文件失败"),
     SERVER_ERROR(503,"服务器内部错误"),
     // 数据错误 1000~2000
     DATA_EXIST(1000,"数据已经存在"),
