@@ -21,7 +21,7 @@ public class NewsController {
     @Autowired
     private WmNewsService wmNewsService;
 
-    @PostMapping("list")
+    @PostMapping("/list")
     public ResponseResult listNewsByCondition(@RequestBody WmNewsPageReqDto wmNewsPageReqDto){
         return wmNewsService.listNewsByConditions(wmNewsPageReqDto);
     }

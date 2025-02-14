@@ -10,10 +10,14 @@
     <select id="listQuery" resultType="com.heima.model.wemedia.pojos.WmMaterial">
         select * from wm_material
         <where>
-            <if test="isCollection != null">
-                and is_collection = #{isCollection}
+            <if test="dto.isCollection != null">
+                and is_collection = #{dto.isCollection}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
             </if>
         </where>
         order by created_Time desc
     </select>
+
 </mapper>

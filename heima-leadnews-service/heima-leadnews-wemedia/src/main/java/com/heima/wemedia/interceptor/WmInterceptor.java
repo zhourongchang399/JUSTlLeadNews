@@ -28,7 +28,8 @@ public class WmInterceptor implements HandlerInterceptor {
         // 从header中取出userId
         String userId = request.getHeader("userId");
         // 存入threadLocal中
-        if (userId != null && userId.length() > 0) {
+        if (userId != null && !userId.isEmpty()) {
+            log.info("当前用户：{}", userId);
             WmThreadLocalUtil.setCurrentId(Long.valueOf(userId));
         }
         // 放行

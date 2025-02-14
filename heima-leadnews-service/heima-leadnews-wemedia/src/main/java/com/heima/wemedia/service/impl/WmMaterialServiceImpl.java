@@ -16,6 +16,7 @@ import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     @Override
     public ResponseResult uploadMaterial(MultipartFile file) {
         // 校验参数
-        if (file.isEmpty() || WmThreadLocalUtil.getCurrentId() == null) {
+        if (file == null || file.isEmpty() || WmThreadLocalUtil.getCurrentId() == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
         }
 
@@ -105,11 +106,11 @@ public class WmMaterialServiceImpl implements WmMaterialService {
         log.info("total: {}", wmMaterialPage.getTotal());
 
         // 封装分页结果
-        PageResponseResult responseResult = new PageResponseResult(wmMaterialDto.getPage(), wmMaterialDto.getSize(), (int) wmMaterialPage.getTotal());
-        responseResult.setData(wmMaterialPage.getResult());  // 返回分页数据
-
+        PageResponseResult pageResponseResult = new PageResponseResult(wmMaterialDto.getPage(), wmMaterialDto.getSize(), (int) wmMaterialPage.getTotal());
+        pageResponseResult.setData(wmMaterialPage.getResult()); // 返回分页数据
+        pageResponseResult.setCode(AppHttpCodeEnum.SUCCESS.getCode());
         // 返回成功结果
-        return PageResponseResult.okResult(responseResult);
+        return pageResponseResult;
 
     }
 }

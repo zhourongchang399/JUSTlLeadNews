@@ -20,7 +20,7 @@ public class ChannelController {
     @Autowired
     private WmChannelService wmChannelService;
 
-    @PostMapping("/channels")
+    @GetMapping("/channels")
     public ResponseResult getAllChannels() {
         return wmChannelService.getAllChannels();
     }
