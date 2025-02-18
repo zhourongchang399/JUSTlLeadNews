@@ -12,4 +12,6 @@ public interface WmMaterialService {
     ResponseResult cancelCollect(Integer id);
 
     ResponseResult collectMaterial(Integer id);
+
+    ResponseResult deletePicture(Integer id);
 }

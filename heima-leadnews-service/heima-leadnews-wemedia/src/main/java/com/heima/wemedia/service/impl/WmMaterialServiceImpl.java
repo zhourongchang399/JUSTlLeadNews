@@ -101,6 +101,9 @@ public class WmMaterialServiceImpl implements WmMaterialService {
         PageHelper.startPage(wmMaterialDto.getPage(), wmMaterialDto.getSize());
 
         // 查询数据库
+        if (wmMaterialDto.getIsCollection() == NOT_COLLECTION) {
+            wmMaterialDto.setIsCollection(null);
+        }
         Page<WmMaterial> wmMaterialPage = wmMaterialMapper.listQuery(id, wmMaterialDto);
 
         // 输出查询结果的总数
@@ -142,6 +145,20 @@ public class WmMaterialServiceImpl implements WmMaterialService {
         wmMaterial.setIsCollection(WemediaConstants.COLLECT_MATERIAL);
         wmMaterial.setId(id);
         wmMaterialMapper.updateMaterial(wmMaterial);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult deletePicture(Integer id) {
+        // 参数校验
+        if (id == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 删除数据
+        WmMaterial wmMaterial = new WmMaterial();
+        wmMaterial.setId(id);
+        wmMaterialMapper.deleteMaterial(wmMaterial);
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }

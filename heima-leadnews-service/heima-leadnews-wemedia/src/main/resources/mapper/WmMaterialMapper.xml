@@ -17,6 +17,11 @@
         where id = #{id}
     </update>
 
+    <delete id="deleteMaterial">
+        delete from wm_material
+        where id = #{id}
+    </delete>
+
     <select id="listQuery" resultType="com.heima.model.wemedia.pojos.WmMaterial">
         select * from wm_material
         <where>

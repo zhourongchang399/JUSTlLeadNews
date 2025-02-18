@@ -16,4 +16,6 @@ public interface WmMaterialMapper {
     Integer selectOne(@Param("url") String s);
 
     void updateMaterial(WmMaterial wmMaterial);
+
+    void deleteMaterial(WmMaterial wmMaterial);
 }
