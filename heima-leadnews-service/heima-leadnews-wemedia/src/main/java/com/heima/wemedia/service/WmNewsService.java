@@ -8,4 +8,6 @@ public interface WmNewsService {
     ResponseResult listNewsByConditions(WmNewsPageReqDto wmNewsPageReqDto);
 
     ResponseResult submitNews(WmNewsDto wmNewsDto);
+
+    ResponseResult getOneNews(Integer id);
 }

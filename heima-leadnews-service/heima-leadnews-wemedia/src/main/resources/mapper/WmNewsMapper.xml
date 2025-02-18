@@ -73,4 +73,9 @@
         order by created_time desc
     </select>
 
+    <select id="getById" resultType="com.heima.model.wemedia.pojos.WmNews">
+        select * from wm_news
+        where id = #{id}
+    </select>
+
 </mapper>

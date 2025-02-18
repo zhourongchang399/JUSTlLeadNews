@@ -2,6 +2,7 @@ package com.heima.wemedia.mapper;
 
 import com.github.pagehelper.Page;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
+import com.heima.model.wemedia.pojos.WmMaterial;
 import com.heima.model.wemedia.pojos.WmNews;
 import com.heima.model.wemedia.pojos.WmNewsMaterial;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,4 +21,6 @@ public interface WmNewsMapper {
     void addNewsMaterial(@Param("wmNewsMaterials") List<WmNewsMaterial> wmNewsMaterials);
 
     void updateNews(WmNews needToUpdateNews);
+
+    WmNews getById(Integer id);
 }

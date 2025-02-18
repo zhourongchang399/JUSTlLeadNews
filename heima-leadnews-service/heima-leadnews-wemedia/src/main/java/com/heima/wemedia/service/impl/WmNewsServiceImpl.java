@@ -12,6 +12,7 @@ import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
+import com.heima.model.wemedia.pojos.WmMaterial;
 import com.heima.model.wemedia.pojos.WmNews;
 import com.heima.model.wemedia.pojos.WmNewsMaterial;
 import com.heima.utils.common.WmThreadLocalUtil;
@@ -131,6 +132,21 @@ public class WmNewsServiceImpl implements WmNewsService {
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult getOneNews(Integer id) {
+        // 校验参数
+        if (id == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 根据Id查询文章
+        WmNews wmNews = wmNewsMapper.getById(id);
+        if (wmNews == null) {
+            throw new CustomException(AppHttpCodeEnum.DATA_NOT_EXIST);
+        }
+        return  ResponseResult.okResult(wmNews);
     }
 
     private void saveNewsAndMaterialsRelativation(Integer newsId, List<String> materials, Short type) {
