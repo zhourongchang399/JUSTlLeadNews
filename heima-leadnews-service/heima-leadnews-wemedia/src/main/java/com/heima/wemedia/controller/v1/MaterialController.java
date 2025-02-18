@@ -31,4 +31,14 @@ public class MaterialController {
         return wmMaterialService.getMaterialList(wmMaterialDto);
     }
 
+    @GetMapping("/cancel_collect/{id}")
+    public ResponseResult cancelCollect(@PathVariable Integer id) {
+        return wmMaterialService.cancelCollect(id);
+    }
+
+    @GetMapping("/collect/{id}")
+    public ResponseResult collectMaterial(@PathVariable Integer id) {
+        return wmMaterialService.collectMaterial(id);
+    }
+
 }

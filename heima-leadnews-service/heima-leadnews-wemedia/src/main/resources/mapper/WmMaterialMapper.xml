@@ -7,6 +7,16 @@
         VALUES(#{userId}, #{url}, #{type}, #{isCollection}, #{createdTime})
     </insert>
 
+    <update id="updateMaterial">
+        update wm_material
+        <set>
+            <if test="isCollection != null">
+                is_collection = #{isCollection}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
     <select id="listQuery" resultType="com.heima.model.wemedia.pojos.WmMaterial">
         select * from wm_material
         <where>

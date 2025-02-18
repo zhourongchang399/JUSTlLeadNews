@@ -3,6 +3,7 @@ package com.heima.wemedia.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.aliyunOSS.service.AliOssService;
+import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
@@ -112,5 +113,35 @@ public class WmMaterialServiceImpl implements WmMaterialService {
         // 返回成功结果
         return pageResponseResult;
 
+    }
+
+    @Override
+    public ResponseResult cancelCollect(Integer id) {
+        // 参数校验
+        if (id == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 更新素材信息
+        WmMaterial wmMaterial = new WmMaterial();
+        wmMaterial.setIsCollection(WemediaConstants.CANCEL_COLLECT_MATERIAL);
+        wmMaterial.setId(id);
+        wmMaterialMapper.updateMaterial(wmMaterial);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult collectMaterial(Integer id) {
+        // 参数校验
+        if (id == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 更新素材信息
+        WmMaterial wmMaterial = new WmMaterial();
+        wmMaterial.setIsCollection(WemediaConstants.COLLECT_MATERIAL);
+        wmMaterial.setId(id);
+        wmMaterialMapper.updateMaterial(wmMaterial);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 }

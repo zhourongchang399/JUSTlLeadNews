@@ -8,4 +8,8 @@ public interface WmMaterialService {
     public ResponseResult uploadMaterial(MultipartFile file);
 
     ResponseResult getMaterialList(WmMaterialDto wmMaterialDto);
+
+    ResponseResult cancelCollect(Integer id);
+
+    ResponseResult collectMaterial(Integer id);
 }
