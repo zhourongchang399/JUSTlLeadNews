@@ -32,7 +32,7 @@ public class WmMaterial implements Serializable {
      * 自媒体用户ID
      */
 //    @TableField("user_id")
-    private Long userId;
+    private Integer userId;
 
     /**
      * 图片地址

@@ -20,4 +20,8 @@
         order by created_Time desc
     </select>
 
+    <select id="selectOne" resultType="java.lang.Integer">
+        select id from wm_material where url = #{url}
+    </select>
+
 </mapper>

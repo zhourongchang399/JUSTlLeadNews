@@ -1,6 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.wemedia.mapper.WmNewsMapper">
+
+    <insert id="saveNews" useGeneratedKeys="true" keyProperty="id">
+        insert into wm_news(user_id, title, content, type, channel_id, labels, created_time, submited_time, status, publish_time, reason, article_id, images)
+        values(#{userId}, #{title}, #{content}, #{type}, #{channelId}, #{labels}, #{createdTime}, #{submitedTime}, #{status},
+               #{publishTime}, #{reason}, #{articleId}, #{images})
+    </insert>
+
+    <insert id="addNewsMaterial">
+        insert into wm_news_material(material_id, news_id, type, ord) 
+        values 
+            <foreach collection="wmNewsMaterials" separator="," item="nm">
+                (#{nm.materialId},#{nm.newsId},#{nm.type},#{nm.ord})
+            </foreach>
+    </insert>
+
+    <update id="updateNews">
+        update wm_news
+        <set>
+            <if test="images != null">
+                images = #{images},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="publishTime != null">
+            publish_time = #{publishTime},
+            </if>
+            <if test="submitedTime != null">
+            submited_time = #{submitedTime},
+            </if>
+            <if test="enable != null">
+                enable = #{enable},
+            </if>
+            <if test="articleId != null">
+                article_Id = #{articleId},
+            </if>
+            <if test="reason != null">
+                reason = #{reason},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delectNews">
+        delete from wm_news where id = #{id};
+    </delete>
+
     <select id="listByConditions" resultType="com.heima.model.wemedia.pojos.WmNews">
         select * from wm_news
         <where>
@@ -25,4 +72,5 @@
         </where>
         order by created_time desc
     </select>
+
 </mapper>

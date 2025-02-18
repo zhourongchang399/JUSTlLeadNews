@@ -1,6 +1,7 @@
 package com.heima.wemedia.controller.v1;
 
 import com.heima.model.common.dtos.ResponseResult;
+import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.wemedia.service.WmNewsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +26,10 @@ public class NewsController {
     public ResponseResult listNewsByCondition(@RequestBody WmNewsPageReqDto wmNewsPageReqDto){
         return wmNewsService.listNewsByConditions(wmNewsPageReqDto);
     }
+
+    @PostMapping("/submit")
+    public ResponseResult submitNews(@RequestBody WmNewsDto wmNewsDto) {
+        return wmNewsService.submitNews(wmNewsDto);
+    }
+
 }

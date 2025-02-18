@@ -12,4 +12,6 @@ public interface WmMaterialMapper {
     public void addMaterial(WmMaterial material);
 
     Page<WmMaterial> listQuery(@Param("userId") long id, @Param("dto") WmMaterialDto wmMaterialDto);
+
+    Integer selectOne(@Param("url") String s);
 }

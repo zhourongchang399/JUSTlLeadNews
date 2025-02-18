@@ -91,7 +91,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
         }
 
         // 获取当前用户
-        Long id = WmThreadLocalUtil.getCurrentId();
+        Integer id = WmThreadLocalUtil.getCurrentId();
         if (id == null) {
             throw new CustomException(AppHttpCodeEnum.NO_OPERATOR_AUTH);
         }

@@ -30,7 +30,7 @@ public class WmInterceptor implements HandlerInterceptor {
         // 存入threadLocal中
         if (userId != null && !userId.isEmpty()) {
             log.info("当前用户：{}", userId);
-            WmThreadLocalUtil.setCurrentId(Long.valueOf(userId));
+            WmThreadLocalUtil.setCurrentId(Integer.valueOf(userId));
         }
         // 放行
         return true;
