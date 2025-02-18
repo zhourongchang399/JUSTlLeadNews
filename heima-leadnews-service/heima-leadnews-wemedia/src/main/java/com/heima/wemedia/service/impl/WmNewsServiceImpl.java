@@ -149,6 +149,31 @@ public class WmNewsServiceImpl implements WmNewsService {
         return  ResponseResult.okResult(wmNews);
     }
 
+    @Override
+    public ResponseResult downOrUp(WmNewsDto wmNewsDto) {
+        // 参数校验
+        if (wmNewsDto == null || wmNewsDto.getId() == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 根据Id查询文章
+        WmNews wmNews = wmNewsMapper.getById(wmNewsDto.getId());
+        if (wmNews == null) {
+            throw new CustomException(AppHttpCodeEnum.NOT_EXIST_NEWS);
+        }
+
+        // 判断当前文章是否已经发布
+        if (wmNews.getStatus() != WemediaConstants.WM_NEWS_PUBLISHED) {
+            throw new CustomException(AppHttpCodeEnum.NOT_PUBLISHED_THEN_NOT_DOWN_OR_UP);
+        }
+
+        // 修改文章信息
+        WmNews needToUpdateNews = new WmNews();
+        BeanUtils.copyProperties(wmNewsDto, needToUpdateNews);
+        wmNewsMapper.updateNews(needToUpdateNews);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
     private void saveNewsAndMaterialsRelativation(Integer newsId, List<String> materials, Short type) {
         // 判断素材是否失效，并获取素材信息
         if (!materials.isEmpty()) {

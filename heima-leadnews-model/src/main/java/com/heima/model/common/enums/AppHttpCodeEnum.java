@@ -26,7 +26,9 @@ public enum AppHttpCodeEnum {
     DATA_NOT_EXIST(1002,"数据不存在"),
     // 数据错误 3000~3500
     NO_OPERATOR_AUTH(3000,"无权限操作"),
-    NEED_ADMIND(3001,"需要管理员权限");
+    NEED_ADMIND(3001,"需要管理员权限"),
+    NOT_PUBLISHED_THEN_NOT_DOWN_OR_UP(501,"当前文章并未发布，不能上下架"),
+    NOT_EXIST_NEWS(1002,"文章不存在");
 
     int code;
     String errorMessage;

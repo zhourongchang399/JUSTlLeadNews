@@ -10,4 +10,6 @@ public interface WmNewsService {
     ResponseResult submitNews(WmNewsDto wmNewsDto);
 
     ResponseResult getOneNews(Integer id);
+
+    ResponseResult downOrUp(WmNewsDto wmNewsDto);
 }
