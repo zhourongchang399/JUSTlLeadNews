@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.wemedia.mapper.WmNewsMaterialMapper">
+
+    <insert id="addNewsMaterial">
+        insert into wm_news_material(material_id, news_id, type, ord)
+        values
+        <foreach collection="wmNewsMaterials" separator="," item="nm">
+            (#{nm.materialId},#{nm.newsId},#{nm.type},#{nm.ord})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByNewsIdAndType">
+        delete from wm_news_material
+        where news_id = #{newsId} and type = #{type}
+    </delete>
+
+</mapper>

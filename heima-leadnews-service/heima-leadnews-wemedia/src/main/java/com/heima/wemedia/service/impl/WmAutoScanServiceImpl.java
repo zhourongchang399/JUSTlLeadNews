@@ -16,6 +16,7 @@ import com.heima.wemedia.mapper.WmUserMapper;
 import com.heima.wemedia.service.WmAutoScanService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
  * @date ：2025/2/20 14:55
  */
 @Service
+@Async
 public class WmAutoScanServiceImpl implements WmAutoScanService {
 
     @Autowired
