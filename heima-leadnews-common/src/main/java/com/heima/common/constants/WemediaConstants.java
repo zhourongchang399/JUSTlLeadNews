@@ -16,5 +16,11 @@ public class WemediaConstants {
     public static final Short WM_CONTENT_REFERENCE = 0;
     public static final Short WM_COVER_REFERENCE = 1;
 
+    public static final Short WM_NEWS_DRAFT = 0;
+    public static final Short WM_NEWS_WAIT_TO_CHECK = 1;
+    public static final Short WM_NEWS_FAIL_CHECK = 2;
+    public static final Short WM_NEWS_PERSON_CHECK = 3;
+    public static final Short WM_NEWS_PASS_PERSON_CHECK = 4;
+    public static final Short WM_NEWS_PASS_CHECK = 8;
     public static final Short WM_NEWS_PUBLISHED = 9;
 }

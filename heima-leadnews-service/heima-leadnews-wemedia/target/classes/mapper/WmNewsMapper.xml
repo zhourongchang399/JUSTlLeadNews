@@ -8,19 +8,32 @@
                #{publishTime}, #{reason}, #{articleId}, #{images})
     </insert>
 
-    <insert id="addNewsMaterial">
-        insert into wm_news_material(material_id, news_id, type, ord) 
-        values 
-            <foreach collection="wmNewsMaterials" separator="," item="nm">
-                (#{nm.materialId},#{nm.newsId},#{nm.type},#{nm.ord})
-            </foreach>
-    </insert>
-
     <update id="updateNews">
         update wm_news
         <set>
-            <if test="images != null">
-                images = #{images},
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="type != type">
+                type = #{type},
+            </if>
+            <if test="channelId != channelId">
+                channel_Id = #{channelId},
+            </if>
+            <if test="labels != null">
+                labels = #{labels},
+            </if>
+            <if test="createdTime != null">
+                created_Time = #{createdTime},
+            </if>
+            <if test="submitedTime != null">
+                submited_time = #{submitedTime},
             </if>
             <if test="status != null">
                 status = #{status},
@@ -28,8 +41,8 @@
             <if test="publishTime != null">
             publish_time = #{publishTime},
             </if>
-            <if test="submitedTime != null">
-            submited_time = #{submitedTime},
+            <if test="reason != null">
+                reason = #{reason},
             </if>
             <if test="enable != null">
                 enable = #{enable},
@@ -37,8 +50,8 @@
             <if test="articleId != null">
                 article_Id = #{articleId},
             </if>
-            <if test="reason != null">
-                reason = #{reason},
+            <if test="images != null">
+                images = #{images},
             </if>
         </set>
         where id = #{id}

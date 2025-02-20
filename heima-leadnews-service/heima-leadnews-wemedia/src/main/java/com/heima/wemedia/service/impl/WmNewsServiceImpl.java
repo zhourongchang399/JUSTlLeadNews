@@ -18,6 +18,8 @@ import com.heima.model.wemedia.pojos.WmNewsMaterial;
 import com.heima.utils.common.WmThreadLocalUtil;
 import com.heima.wemedia.mapper.WmMaterialMapper;
 import com.heima.wemedia.mapper.WmNewsMapper;
+import com.heima.wemedia.mapper.WmNewsMaterialMapper;
+import com.heima.wemedia.service.WmAutoScanService;
 import com.heima.wemedia.service.WmNewsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,13 @@ public class WmNewsServiceImpl implements WmNewsService {
     private WmNewsMapper wmNewsMapper;
 
     @Autowired
+    private WmNewsMaterialMapper wmNewsMaterialMapper;
+
+    @Autowired
     private WmMaterialMapper wmMaterialMapper;
+
+    @Autowired
+    private WmAutoScanService wmAutoScanService;
 
     final static Integer DEFAULT_PAGE_SIZE = 20;
     final static Integer DEFAULT_PAGE_NUM = 1;
@@ -85,13 +93,40 @@ public class WmNewsServiceImpl implements WmNewsService {
 
         // 提交或修改文章
         Integer newsId = saveOrModifyArticle(wmNewsDto);
+        wmNewsDto.setId(newsId);
 
         // 判断当前文章是否为草稿,满足条件则结束当前方法
         if (wmNewsDto.getStatus() == 0) {
             return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
         }
 
-        // 获取文章中的素材
+        // 获取文章内容中的素材
+        List<String> materials = getMaterials(wmNewsDto);
+
+        // 保存文章与素材关系
+        saveNewsAndMaterialsRelativation(newsId, materials, WemediaConstants.WM_CONTENT_REFERENCE);
+
+        // 获取文章封面中的素材
+        List<String> images = getCoversImages(wmNewsDto, materials);
+
+        // 判断封面类型是否自动
+        if (wmNewsDto.getType() == WemediaConstants.WM_NEWS_TYPE_AUTO) {
+            // 更新文章信息表
+            wmNewsDto.setImages(images);
+            updateNewsImages(images, newsId);
+        }
+
+        // 保存文章封面和素材关系
+        saveNewsAndMaterialsRelativation(newsId, images, WemediaConstants.WM_COVER_REFERENCE);
+
+        // 文章自动审核
+        wmAutoScanService.scanNews(wmNewsDto);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    private static List<String> getMaterials(WmNewsDto wmNewsDto) {
         List<String> materials = new ArrayList<>();
         List<Map> maps = JSON.parseArray(wmNewsDto.getContent(), Map.class);
         for (Map map : maps) {
@@ -100,11 +135,10 @@ public class WmNewsServiceImpl implements WmNewsService {
                 materials.add(materialUrl);
             }
         }
+        return materials;
+    }
 
-        // 保存文章与素材关系
-        saveNewsAndMaterialsRelativation(newsId, materials, WemediaConstants.WM_CONTENT_REFERENCE);
-
-        // 获取文章封面图片信息
+    private static List<String> getCoversImages(WmNewsDto wmNewsDto, List<String> materials) {
         List<String> images = new ArrayList<>();
         if (wmNewsDto.getType() != WemediaConstants.WM_NEWS_TYPE_AUTO) {
             images = wmNewsDto.getImages();
@@ -115,8 +149,10 @@ public class WmNewsServiceImpl implements WmNewsService {
                 images = materials.subList(WemediaConstants.WM_NEWS_NONE_IMAGE, WemediaConstants.WM_NEWS_MANY_IMAGE);
             }
         }
+        return images;
+    }
 
-        // 更新文章信息表
+    private void updateNewsImages(List<String> images, Integer newsId) {
         WmNews needToUpdateNews = new WmNews();
         StringJoiner stringJoiner = new StringJoiner(",");
         for (String s : images) {
@@ -126,12 +162,6 @@ public class WmNewsServiceImpl implements WmNewsService {
         needToUpdateNews.setId(newsId);
         needToUpdateNews.setSubmitedTime(new Date());
         wmNewsMapper.updateNews(needToUpdateNews);
-
-        // 保存文章封面和素材关系
-        saveNewsAndMaterialsRelativation(newsId, images, WemediaConstants.WM_COVER_REFERENCE);
-
-        // 返回结果
-        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
     @Override
@@ -190,18 +220,23 @@ public class WmNewsServiceImpl implements WmNewsService {
                 wmNewsMaterial.setNewsId(newsId);
                 wmNewsMaterials.add(wmNewsMaterial);
             }
-            wmNewsMapper.addNewsMaterial(wmNewsMaterials);
+            // 删除原先文章素材关系
+            wmNewsMaterialMapper.deleteByNewsId(newsId);
+            // 新增文章素材关系
+            wmNewsMaterialMapper.addNewsMaterial(wmNewsMaterials);
         }
     }
 
     // 提交或修改文章
     private Integer saveOrModifyArticle(WmNewsDto wmNewsDto) {
-        WmNews wmNews = new WmNews();
         // 拷贝对象
+        WmNews wmNews = new WmNews();
         BeanUtils.copyProperties(wmNewsDto, wmNews);
+
         // 补全WnNews对象
         wmNews.setUserId(WmThreadLocalUtil.getCurrentId());
         wmNews.setCreatedTime(new Date());
+
         // 转存images
         List<String> images = wmNewsDto.getImages();
         if (images != null && images.size() > 0) {
@@ -211,17 +246,22 @@ public class WmNewsServiceImpl implements WmNewsService {
             }
             wmNews.setImages(sb.toString());
         }
+
         // 如果封面类型为自动则type存储为null
         if (wmNewsDto.getType() == WemediaConstants.WM_NEWS_TYPE_AUTO) {
             wmNews.setType(null);
         }
+
         // 判断是否是第一次保存/修改文章
         if (wmNews.getId() != null) {
-            wmNewsMapper.delectNews(wmNews.getId());
+            // 修改文章
+            wmNewsMapper.updateNews(wmNews);
+            log.info("修改的文章ID：{}", wmNews.getId());
+        } else {
+            // 保存文章
+            wmNewsMapper.saveNews(wmNews);
+            log.info("新增的文章ID：{}", wmNews.getId());
         }
-        // 保存文章
-        wmNewsMapper.saveNews(wmNews);
-        log.info("新增文章ID：{}", wmNews.getId());
         return wmNews.getId();
     }
 

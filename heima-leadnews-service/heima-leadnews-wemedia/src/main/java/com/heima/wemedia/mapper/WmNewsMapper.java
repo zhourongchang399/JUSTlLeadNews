@@ -18,9 +18,8 @@ public interface WmNewsMapper {
 
     void delectNews(@Param("id") Integer id);
 
-    void addNewsMaterial(@Param("wmNewsMaterials") List<WmNewsMaterial> wmNewsMaterials);
-
     void updateNews(WmNews needToUpdateNews);
 
     WmNews getById(Integer id);
+
 }
