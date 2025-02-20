@@ -1,7 +1,9 @@
 package com.heima.article.service;
 
+import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.article.dtos.ArticleHomeDto;
 import com.heima.model.article.pojos.ApArticle;
+import com.heima.model.common.dtos.ResponseResult;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,4 +17,6 @@ import java.util.List;
 public interface ApArticleService {
 
     public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto);
+
+    ResponseResult saveArticle(ArticleDto articleDto);
 }

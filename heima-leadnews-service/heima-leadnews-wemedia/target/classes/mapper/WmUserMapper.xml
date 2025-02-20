@@ -11,6 +11,9 @@
             <if test="password != null">
                 and password = #{password}
             </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
         </where>
     </select>
 

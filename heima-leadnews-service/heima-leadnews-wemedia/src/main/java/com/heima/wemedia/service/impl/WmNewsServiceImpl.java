@@ -91,6 +91,13 @@ public class WmNewsServiceImpl implements WmNewsService {
             throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
         }
 
+        // 获取文章内容中的素材
+        List<String> materials = getMaterials(wmNewsDto);
+
+        // 获取文章封面中的素材
+        List<String> images = getCoversImages(wmNewsDto, materials);
+        wmNewsDto.setImages(images);
+
         // 提交或修改文章
         Integer newsId = saveOrModifyArticle(wmNewsDto);
         wmNewsDto.setId(newsId);
@@ -100,27 +107,14 @@ public class WmNewsServiceImpl implements WmNewsService {
             return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
         }
 
-        // 获取文章内容中的素材
-        List<String> materials = getMaterials(wmNewsDto);
-
         // 保存文章与素材关系
         saveNewsAndMaterialsRelativation(newsId, materials, WemediaConstants.WM_CONTENT_REFERENCE);
-
-        // 获取文章封面中的素材
-        List<String> images = getCoversImages(wmNewsDto, materials);
-
-        // 判断封面类型是否自动
-        if (wmNewsDto.getType() == WemediaConstants.WM_NEWS_TYPE_AUTO) {
-            // 更新文章信息表
-            wmNewsDto.setImages(images);
-            updateNewsImages(images, newsId);
-        }
 
         // 保存文章封面和素材关系
         saveNewsAndMaterialsRelativation(newsId, images, WemediaConstants.WM_COVER_REFERENCE);
 
         // 文章自动审核
-        wmAutoScanService.scanNews(wmNewsDto);
+        wmAutoScanService.scanNews(wmNewsDto.getId());
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
@@ -221,7 +215,7 @@ public class WmNewsServiceImpl implements WmNewsService {
                 wmNewsMaterials.add(wmNewsMaterial);
             }
             // 删除原先文章素材关系
-            wmNewsMaterialMapper.deleteByNewsId(newsId);
+            wmNewsMaterialMapper.deleteByNewsIdAndType(newsId, type);
             // 新增文章素材关系
             wmNewsMaterialMapper.addNewsMaterial(wmNewsMaterials);
         }
@@ -235,7 +229,9 @@ public class WmNewsServiceImpl implements WmNewsService {
 
         // 补全WnNews对象
         wmNews.setUserId(WmThreadLocalUtil.getCurrentId());
-        wmNews.setCreatedTime(new Date());
+        if (wmNews.getId() == null) {
+            wmNews.setCreatedTime(new Date());
+        }
 
         // 转存images
         List<String> images = wmNewsDto.getImages();

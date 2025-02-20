@@ -23,4 +23,6 @@ public class WemediaConstants {
     public static final Short WM_NEWS_PASS_PERSON_CHECK = 4;
     public static final Short WM_NEWS_PASS_CHECK = 8;
     public static final Short WM_NEWS_PUBLISHED = 9;
+
+    public static final String CHECK_SUCCEED = "审核成功";
 }

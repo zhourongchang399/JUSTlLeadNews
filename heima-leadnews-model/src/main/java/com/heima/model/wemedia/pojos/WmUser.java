@@ -5,6 +5,7 @@ package com.heima.model.wemedia.pojos;
 //import com.baomidou.mybatisplus.annotation.TableId;
 //import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,9 +19,14 @@ import java.util.Date;
  */
 @Data
 //@TableName("wm_user")
+@NoArgsConstructor
 public class WmUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    public WmUser(Integer id) {
+        this.id = id;
+    }
 
     /**
      * 主键

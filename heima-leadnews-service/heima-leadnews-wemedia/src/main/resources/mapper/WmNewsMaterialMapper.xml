@@ -10,9 +10,9 @@
         </foreach>
     </insert>
 
-    <delete id="deleteByNewsId">
+    <delete id="deleteByNewsIdAndType">
         delete from wm_news_material
-        where news_id = #{newsId}
+        where news_id = #{newsId} and type = #{type}
     </delete>
 
 </mapper>

@@ -12,4 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ApArticleContentMapper{
+    void update(ApArticleContent apArticleContent);
+
+    void insert(ApArticleContent apArticleContent);
 }

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.article.mapper.ApArticleMapper">
+
+    <insert id="insertArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into
+            ap_article(title, author_id, author_name, channel_id, channel_name, layout, flag, images, labels, likes, collection, comment, views, province_id, city_id, county_id, created_time, publish_time, static_url)
+        values (#{title}, #{authorId}, #{authorName}, #{channelId}, #{channelName}, #{layout}, #{flag}, #{images}, #{labels},
+                #{likes}, #{collection}, #{comment}, #{views}, #{provinceId}, #{cityId}, #{countyId}, #{createdTime}, #{publishTime}, #{staticUrl})
+    </insert>
 
     <update id="updateById">
         update ap_article

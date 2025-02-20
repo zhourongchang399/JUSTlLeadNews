@@ -5,4 +5,7 @@
     <select id="findAll" resultType="com.heima.model.wemedia.pojos.WmChannel">
         select * from wm_channel
     </select>
+    <select id="getById" resultType="com.heima.model.wemedia.pojos.WmChannel">
+        select * from wm_channel where id = #{id}
+    </select>
 </mapper>

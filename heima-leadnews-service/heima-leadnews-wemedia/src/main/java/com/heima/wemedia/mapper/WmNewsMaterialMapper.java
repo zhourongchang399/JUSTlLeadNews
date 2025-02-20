@@ -11,5 +11,5 @@ public interface WmNewsMaterialMapper {
 
     void addNewsMaterial(@Param("wmNewsMaterials") List<WmNewsMaterial> wmNewsMaterials);
 
-    void deleteByNewsId(Integer newsId);
+    void deleteByNewsIdAndType(Integer newsId, Short type);
 }

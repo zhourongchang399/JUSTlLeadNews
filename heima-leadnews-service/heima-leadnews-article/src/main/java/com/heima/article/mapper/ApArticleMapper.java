@@ -12,4 +12,6 @@ public interface ApArticleMapper {
     Page<ApArticle> pageQueryApArticle(@Param("type") Short type,@Param("articleHomeDto") ArticleHomeDto articleHomeDto);
 
     void updateById(ApArticle article);
+
+    void insertArticle(ApArticle apArticle);
 }

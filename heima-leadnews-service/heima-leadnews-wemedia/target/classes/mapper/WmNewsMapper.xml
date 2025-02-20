@@ -20,10 +20,10 @@
             <if test="content != null">
                 content = #{content},
             </if>
-            <if test="type != type">
+            <if test="type != null">
                 type = #{type},
             </if>
-            <if test="channelId != channelId">
+            <if test="channelId != null">
                 channel_Id = #{channelId},
             </if>
             <if test="labels != null">
