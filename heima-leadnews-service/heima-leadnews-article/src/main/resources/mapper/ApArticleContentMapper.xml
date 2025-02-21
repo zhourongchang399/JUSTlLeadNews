@@ -14,7 +14,12 @@
                 content = #{content}
             </if>
         </set>
-        where articleId = #{articleId}
+        where article_id = #{articleId}
     </update>
+
+    <select id="getByArticleId" resultType="com.heima.model.article.pojos.ApArticleContent">
+        select * from ap_article_content
+        where article_id = #{articleId}
+    </select>
 
 </mapper>

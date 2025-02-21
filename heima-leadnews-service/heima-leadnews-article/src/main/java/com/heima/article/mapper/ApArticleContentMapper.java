@@ -15,4 +15,6 @@ public interface ApArticleContentMapper{
     void update(ApArticleContent apArticleContent);
 
     void insert(ApArticleContent apArticleContent);
+
+    ApArticleContent getByArticleId(Long articleId);
 }

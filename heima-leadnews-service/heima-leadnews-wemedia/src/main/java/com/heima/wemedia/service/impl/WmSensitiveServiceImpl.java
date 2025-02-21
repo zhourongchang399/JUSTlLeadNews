@@ -7,6 +7,7 @@ import com.heima.wemedia.service.WmSensitiveService;
 import org.apache.yetus.audience.InterfaceAudience;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class WmSensitiveServiceImpl implements WmSensitiveService {
     private WmSensitiveMapper wmSensitiveMapper;
 
     @Override
+    @Transactional
     public Map<String, Integer> textCheck(String text) {
         Map<String, Integer> resultMap = null;
 

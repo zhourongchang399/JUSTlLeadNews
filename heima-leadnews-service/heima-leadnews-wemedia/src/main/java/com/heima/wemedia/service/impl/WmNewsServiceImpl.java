@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -54,6 +55,7 @@ public class WmNewsServiceImpl implements WmNewsService {
     final static Integer DEFAULT_PAGE_NUM = 1;
 
     @Override
+    @Transactional
     public ResponseResult listNewsByConditions(WmNewsPageReqDto wmNewsPageReqDto) {
         // 参数校验
         if (wmNewsPageReqDto.getSize() == null || wmNewsPageReqDto.getSize() == 0) {
@@ -84,6 +86,7 @@ public class WmNewsServiceImpl implements WmNewsService {
     }
 
     @Override
+    @Transactional
     public ResponseResult submitNews(WmNewsDto wmNewsDto) {
 
         // 校验参数
@@ -159,6 +162,7 @@ public class WmNewsServiceImpl implements WmNewsService {
     }
 
     @Override
+    @Transactional
     public ResponseResult getOneNews(Integer id) {
         // 校验参数
         if (id == null) {
@@ -174,6 +178,7 @@ public class WmNewsServiceImpl implements WmNewsService {
     }
 
     @Override
+    @Transactional
     public ResponseResult downOrUp(WmNewsDto wmNewsDto) {
         // 参数校验
         if (wmNewsDto == null || wmNewsDto.getId() == null) {

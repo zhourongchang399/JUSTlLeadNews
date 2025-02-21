@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -58,6 +59,7 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
     IArticleClient iArticleClient;
 
     @Override
+    @Transactional
     public void scanNews(Integer id) {
         // 参数校验
         if (id == null) {
@@ -166,7 +168,9 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
 
         // 向APP端发起请求
         ResponseResult responseResult = iArticleClient.saveArticle(articleDto);
-        if (!responseResult.getCode().equals(200)) {
+        if (responseResult != null && responseResult.getCode().equals(200)) {
+            log.info("审核成功！调用app端接口保存文章");
+        } else {
             throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
         }
         // 回调文章ID

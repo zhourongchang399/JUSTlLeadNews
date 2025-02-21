@@ -1,11 +1,13 @@
 package com.heima.article.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.aliyunOSS.service.AliOssService;
 import com.heima.article.mapper.ApArticleConfigMapper;
 import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
+import com.heima.article.service.ApArticleFreemakerService;
 import com.heima.article.service.ApArticleService;
 import com.heima.common.constants.ArticleConstants;
 import com.heima.common.exception.CustomException;
@@ -16,12 +18,23 @@ import com.heima.model.article.pojos.ApArticleConfig;
 import com.heima.model.article.pojos.ApArticleContent;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ：Zc
@@ -44,9 +57,10 @@ public class ApArticleServiceImpl implements ApArticleService {
     private ApArticleContentMapper apArticleContentMapper;
 
     @Autowired
-    private AliOssService aliOssService;
+    private ApArticleFreemakerService apArticleFreemakerService;
 
     @Override
+    @Transactional
     public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto) {
         // 数量校验
         if (articleHomeDto.getSize() == null || articleHomeDto.getSize() == 0) {
@@ -81,6 +95,7 @@ public class ApArticleServiceImpl implements ApArticleService {
     }
 
     @Override
+    @Transactional
     public ResponseResult saveArticle(ArticleDto articleDto) {
         // 参数校验
         if (articleDto == null) {
@@ -97,15 +112,26 @@ public class ApArticleServiceImpl implements ApArticleService {
             // 保存文章配置
             saveArticleConfig(articleId);
         } else {
+            articleId = articleDto.getId();
             // 修改文章信息
             modifyArticle(articleDto);
             // 修改文章内容
             modifyArticleContent(articleDto);
         }
 
+        // 异步生成静态文件
+        try {
+            apArticleFreemakerService.ganerateStaricFile(articleId);
+        } catch (TemplateException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // 操作成功，返回文章ID
         return ResponseResult.okResult(articleId);
     }
+
 
     private void modifyArticle(ArticleDto articleDto) {
         // 参数拷贝

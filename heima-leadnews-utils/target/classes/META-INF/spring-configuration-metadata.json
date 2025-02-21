@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "name": "tezz4j.ocr",
+      "type": "com.heima.utils.common.OCRUtil",
+      "sourceType": "com.heima.utils.common.OCRUtil"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tezz4j.ocr.language",
+      "type": "java.lang.String",
+      "sourceType": "com.heima.utils.common.OCRUtil",
+      "defaultValue": "chi_sim"
+    },
+    {
+      "name": "tezz4j.ocr.path",
+      "type": "java.lang.String",
+      "sourceType": "com.heima.utils.common.OCRUtil",
+      "defaultValue": "D:\\Code\\heima-leadnews\\heima-leadnews-utils\\src\\main\\resources\\tessdata"
+    }
+  ],
+  "hints": []
+}

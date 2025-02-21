@@ -17,6 +17,7 @@ import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     final static Integer PAGE_SIZE = 20;
 
     @Override
+    @Transactional
     public ResponseResult uploadMaterial(MultipartFile file) {
         // 校验参数
         if (file == null || file.isEmpty() || WmThreadLocalUtil.getCurrentId() == null) {
@@ -82,6 +84,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     }
 
     @Override
+    @Transactional
     public ResponseResult getMaterialList(WmMaterialDto wmMaterialDto) {
         // 校验参数
         if (wmMaterialDto.getPage() == null || wmMaterialDto.getPage() < 1) {
@@ -119,6 +122,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     }
 
     @Override
+    @Transactional
     public ResponseResult cancelCollect(Integer id) {
         // 参数校验
         if (id == null) {
@@ -149,6 +153,7 @@ public class WmMaterialServiceImpl implements WmMaterialService {
     }
 
     @Override
+    @Transactional
     public ResponseResult deletePicture(Integer id) {
         // 参数校验
         if (id == null) {

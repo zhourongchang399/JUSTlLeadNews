@@ -12,6 +12,7 @@ import com.heima.wemedia.service.WmUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class WmUserServiceImpl implements WmUserService {
     private WmUserMapper wmUserMapper;
 
     @Override
+    @Transactional
     public ResponseResult login(WmLoginDto dto) {
         //1.检查参数
         if(StringUtils.isBlank(dto.getName()) || StringUtils.isBlank(dto.getPassword())){
