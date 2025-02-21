@@ -23,10 +23,10 @@ import java.io.File;
 @Slf4j
 public class OCRUtil {
 
-    static String path = "D:\\Code\\heima-leadnews\\heima-leadnews-utils\\src\\main\\resources\\tessdata";
-    static String language = "chi_sim";
+    private String path;
+    private String language;
 
-    public static String scanImage(BufferedImage bufferedImage){
+    public String scanImage(BufferedImage bufferedImage){
         String result = null;
         try {
             //创建Tesseract对象

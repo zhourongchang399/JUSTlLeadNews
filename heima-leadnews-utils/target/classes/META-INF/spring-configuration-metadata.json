@@ -10,14 +10,12 @@
     {
       "name": "tezz4j.ocr.language",
       "type": "java.lang.String",
-      "sourceType": "com.heima.utils.common.OCRUtil",
-      "defaultValue": "chi_sim"
+      "sourceType": "com.heima.utils.common.OCRUtil"
     },
     {
       "name": "tezz4j.ocr.path",
       "type": "java.lang.String",
-      "sourceType": "com.heima.utils.common.OCRUtil",
-      "defaultValue": "D:\\Code\\heima-leadnews\\heima-leadnews-utils\\src\\main\\resources\\tessdata"
+      "sourceType": "com.heima.utils.common.OCRUtil"
     }
   ],
   "hints": []

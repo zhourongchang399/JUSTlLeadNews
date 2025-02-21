@@ -21,4 +21,5 @@ public class AliYunOSSAutoConfig {
     public AliOssService aliOssService(AliYunOSSArgConfig aliYunOSSArgConfig) {
         return new AliOssService(aliYunOSSArgConfig);
     }
+
 }

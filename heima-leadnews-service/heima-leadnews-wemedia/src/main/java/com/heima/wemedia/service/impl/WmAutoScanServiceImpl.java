@@ -58,6 +58,9 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
     @Autowired
     IArticleClient iArticleClient;
 
+    @Autowired
+    OCRUtil ocrUtil;
+
     @Override
     @Transactional
     public void scanNews(Integer id) {
@@ -125,7 +128,7 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
                 BufferedImage imageFile = ImageIO.read(new ByteArrayInputStream(imageBytes));
 
                 if (imageFile != null) {
-                    String scannedText = OCRUtil.scanImage(imageFile);
+                    String scannedText = ocrUtil.scanImage(imageFile);
                     imagesText.add(scannedText);
                 } else {
                     System.err.println("Failed to read the image.");
