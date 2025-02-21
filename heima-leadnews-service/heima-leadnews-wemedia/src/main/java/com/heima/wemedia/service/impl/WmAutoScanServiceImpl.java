@@ -14,15 +14,13 @@ import com.heima.wemedia.mapper.WmChannelMapper;
 import com.heima.wemedia.mapper.WmNewsMapper;
 import com.heima.wemedia.mapper.WmUserMapper;
 import com.heima.wemedia.service.WmAutoScanService;
+import com.heima.wemedia.service.WmSensitiveService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,6 +43,9 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
     private WmUserMapper wmUserMapper;
 
     @Autowired
+    private WmSensitiveService wmSensitiveService;
+
+    @Autowired
     IArticleClient iArticleClient;
 
     @Override
@@ -63,15 +64,23 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
         // 提取文章图文信息
         List<List<String>> textAndImages = getTextAndImages(wmNews);
 
-        // TODO 文章文本内容审核
         Short status = WemediaConstants.WM_NEWS_PASS_CHECK;
         String reason = WemediaConstants.CHECK_SUCCEED;
+
+        // 文章文本内容审核
+        StringJoiner stringJoiner = new StringJoiner(",");
+        textAndImages.get(0).forEach(stringJoiner::add);
+        Map<String, Integer> resultMap = wmSensitiveService.textCheck(stringJoiner.toString());
+        if (!resultMap.isEmpty()) {
+            status = WemediaConstants.WM_NEWS_FAIL_CHECK;
+            reason = WemediaConstants.CHECK_FAIL_SENSITIVE + resultMap.toString();
+        }
 
         // TODO 文章图片内容审核
 
         // 调用APP端保存审核通过的文章
         Long articleId = null;
-        if (true) {
+        if (status.equals(WemediaConstants.WM_NEWS_PASS_CHECK)) {
             articleId = saveApArticle(wmNews);
         }
 
