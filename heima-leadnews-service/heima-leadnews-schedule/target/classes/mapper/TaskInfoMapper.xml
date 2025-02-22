@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.schedule.mapper.TaskInfoMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="taskId">
+        insert into taskinfo(execute_time, parameters, priority, task_type)
+        values (#{executeTime}, #{parameters}, #{priority}, #{taskType})
+    </insert>
+    <delete id="deleteById">
+        DELETE FROM taskinfo WHERE task_id = #{taskId}
+    </delete>
+</mapper>
