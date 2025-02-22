@@ -6,4 +6,6 @@ public interface ScheduleService {
 
     public void addTask(Task task);
 
+    public void cancelTask(Long taskId);
+
 }

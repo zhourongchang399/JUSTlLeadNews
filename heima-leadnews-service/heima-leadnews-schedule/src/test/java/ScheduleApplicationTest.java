@@ -16,7 +16,6 @@ public class ScheduleApplicationTest {
 
     public void redisTest() {
         RedisTemplate redisTemplate = new RedisTemplate();
-
     }
 
 }

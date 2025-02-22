@@ -5,4 +5,37 @@
         insert into taskinfo_logs(task_id, execute_time, parameters, priority, task_type, version)
             VALUE (#{taskId}, #{executeTime}, #{parameters}, #{priority}, #{taskType}, #{version})
     </insert>
+
+    <update id="update">
+        update taskinfo_logs
+        <set>
+            <if test="executeTime != null">
+                execute_time = #{executeTime},
+            </if>
+            <if test="parameters != null">
+                parameters = #{parameters},
+            </if>
+            <if test="priority != null">
+                priority = #{priority},
+            </if>
+            <if test="taskType != null">
+                task_Type = #{taskType},
+            </if>
+            <if test="version != null">
+                version = #{version},
+            </if>
+            <if test="executeTime != null">
+                execute_time = #{executeTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where task_id = #{taskId}
+    </update>
+
+    <select id="getById" resultType="com.heima.model.schedule.pojos.TaskinfoLogs">
+        select * from taskinfo_logs where task_id = #{taskId}
+    </select>
+
 </mapper>

@@ -5,4 +5,7 @@
         insert into taskinfo(execute_time, parameters, priority, task_type)
         values (#{executeTime}, #{parameters}, #{priority}, #{taskType})
     </insert>
+    <delete id="deleteById">
+        DELETE FROM taskinfo WHERE task_id = #{taskId}
+    </delete>
 </mapper>
