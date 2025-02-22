@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="heima-leadnews-test" />
         <module name="heima-leadnews-aliyunoss-starter" />
+        <module name="heima-leadnews-schedule" />
         <module name="heima-leadnews-media-gateway" />
         <module name="heima-leadnews-utils" />
         <module name="heima-leadnews-wemedia" />
@@ -36,6 +37,7 @@
       <module name="heima-leadnews-gateway" options="-parameters" />
       <module name="heima-leadnews-media-gateway" options="-parameters" />
       <module name="heima-leadnews-model" options="-parameters" />
+      <module name="heima-leadnews-schedule" options="-parameters" />
       <module name="heima-leadnews-service" options="-parameters" />
       <module name="heima-leadnews-test" options="-parameters" />
       <module name="heima-leadnews-user" options="-parameters" />

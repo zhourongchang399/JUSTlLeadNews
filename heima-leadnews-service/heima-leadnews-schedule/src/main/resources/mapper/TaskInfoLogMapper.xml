@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.schedule.mapper.TaskInfoLogMapper">
+    <insert id="insert">
+        insert into taskinfo_logs(task_id, execute_time, parameters, priority, task_type, version)
+            VALUE (#{taskId}, #{executeTime}, #{parameters}, #{priority}, #{taskType}, #{version})
+    </insert>
+</mapper>
