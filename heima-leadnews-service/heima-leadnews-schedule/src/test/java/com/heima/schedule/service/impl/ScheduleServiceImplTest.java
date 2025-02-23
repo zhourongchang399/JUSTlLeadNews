@@ -28,17 +28,25 @@ class ScheduleServiceImplTest {
     void addTask() {
         Task task = new Task();
         task.setTaskType(0);
-        task.setParameters("此刻".getBytes(StandardCharsets.UTF_8));
+        task.setParameters("5分钟后".getBytes(StandardCharsets.UTF_8));
         task.setPriority(1);
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(5);
         task.setExecuteTime(localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         scheduleService.addTask(task);
 
+        Task task2 = new Task();
+        task2.setTaskType(0);
+        task2.setParameters("3分钟后".getBytes(StandardCharsets.UTF_8));
+        task2.setPriority(1);
+        LocalDateTime localDateTime2 = LocalDateTime.now().plusMinutes(3);
+        task2.setExecuteTime(localDateTime2.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        scheduleService.addTask(task2);
+
         Task task1 = new Task();
         task1.setTaskType(0);
-        task1.setParameters("此刻1".getBytes(StandardCharsets.UTF_8));
+        task1.setParameters("1分钟后".getBytes(StandardCharsets.UTF_8));
         task1.setPriority(1);
-        LocalDateTime localDateTime1 = LocalDateTime.now();
+        LocalDateTime localDateTime1 = LocalDateTime.now().plusMinutes(1);
         task1.setExecuteTime(localDateTime1.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         scheduleService.addTask(task1);
     }

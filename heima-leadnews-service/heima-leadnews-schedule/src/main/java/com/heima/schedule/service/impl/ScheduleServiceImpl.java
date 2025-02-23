@@ -15,12 +15,16 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,6 +39,7 @@ import java.util.*;
 public class ScheduleServiceImpl implements ScheduleService {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleServiceImpl.class);
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -173,7 +178,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Scheduled(cron = "0 0/5 * * * ?")
-    public void updateFromDBToRedis() {
+    public void updateFromDBToRedis() throws IOException {
         log.info("执行数据库定时更新到redis任务！！！");
         // 匹配Redis中的keys
         Set<String> scanKeys = scanKeys(ScheduleConstants.CURRENT + "*");
@@ -200,7 +205,52 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
-    private Set<String> scanKeys(String pattern) {
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void updateFromFutureToCurrent() throws IOException {
+        log.info("执行从ZSet更新到List的定时任务！！！");
+        // 从ZSet中获取预执行任务的key
+        Set<String> scanKeys = scanKeys(ScheduleConstants.FUTURE + "*");
+
+        if (!scanKeys.isEmpty()) {
+            for (String key : scanKeys) {
+                // 从ZSet中获取执行时间在当前时间之前的任务
+                Set<String> paperToExecTask  = redisTemplate.opsForZSet().rangeByScore(key, 0, LocalDateTime
+                        .now()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli());
+
+                // 通过pipeline执行插入和移除操作
+                if (!paperToExecTask.isEmpty()) {
+                    log.info("Processing key: {}, tasks to move: {}", key, paperToExecTask.size());
+                    execPipeline(key, paperToExecTask);
+                }
+            }
+        }
+
+    }
+
+    private void execPipeline(String key, Set<String> paperToExecTask) {
+        try {
+            redisTemplate.executePipelined((RedisCallback<?>) redisConnection -> {
+                for (String task : paperToExecTask) {
+                    // 更新到List中
+                    String current_key = ScheduleConstants.CURRENT + key.split(ScheduleConstants.FUTURE)[1];
+                    redisConnection.lPush(current_key.getBytes(StandardCharsets.UTF_8), task.getBytes(StandardCharsets.UTF_8));
+                    // 从ZSet中移除
+                    Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+                    byte[] taskBytes = jsonSerializer.serialize(task);
+                    redisConnection.zRem(key.getBytes(StandardCharsets.UTF_8), taskBytes);
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            log.error("Pipeline execution failed for key: {}", key, e);
+            // 可以根据需要重试或抛出异常
+        }
+    }
+
+    private Set<String> scanKeys(String pattern) throws IOException {
         Set<String> keys = new HashSet<>();
         ScanOptions scanOptions = ScanOptions.scanOptions().match(pattern).build();
         RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
