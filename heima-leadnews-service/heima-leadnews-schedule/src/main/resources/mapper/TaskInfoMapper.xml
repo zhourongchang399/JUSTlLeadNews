@@ -8,4 +8,7 @@
     <delete id="deleteById">
         DELETE FROM taskinfo WHERE task_id = #{taskId}
     </delete>
+    <select id="listByTime" resultType="com.heima.model.schedule.pojos.Taskinfo">
+        select * from taskinfo where execute_time &lt; #{time}
+    </select>
 </mapper>

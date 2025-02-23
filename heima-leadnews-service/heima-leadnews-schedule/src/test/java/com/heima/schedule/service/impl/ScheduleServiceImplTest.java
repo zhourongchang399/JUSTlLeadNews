@@ -51,6 +51,7 @@ class ScheduleServiceImplTest {
 
     @Test
     void pullTask(){
-        scheduleService.pollTask(0,1);
+        scheduleService.pullTask(0,1);
     }
+
 }

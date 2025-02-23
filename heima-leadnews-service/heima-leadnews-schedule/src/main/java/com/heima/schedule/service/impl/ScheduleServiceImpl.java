@@ -8,20 +8,23 @@ import com.heima.model.schedule.pojos.TaskinfoLogs;
 import com.heima.schedule.mapper.TaskInfoLogMapper;
 import com.heima.schedule.mapper.TaskInfoMapper;
 import com.heima.schedule.service.ScheduleService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * @author ：Zc
@@ -167,6 +170,48 @@ public class ScheduleServiceImpl implements ScheduleService {
         taskInfoLogMapper.insert(taskinfoLogs);
 
         return taskInfo.getTaskId();
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void updateFromDBToRedis() {
+        log.info("执行数据库定时更新到redis任务！！！");
+        // 匹配Redis中的keys
+        Set<String> scanKeys = scanKeys(ScheduleConstants.CURRENT + "*");
+        Set<String> scanKeysFuture = scanKeys(ScheduleConstants.FUTURE + "*");
+        scanKeys.addAll(scanKeysFuture);
+        log.info("match keys:{}", scanKeys);
+
+        // 清除Redis中的数据
+        if (!scanKeys.isEmpty()) {
+            redisTemplate.delete(scanKeys);
+        }
+
+        // 从DB中查询当前时间后五分钟内需要执行的task
+        List<Taskinfo> taskinfos = taskInfoMapper.listByTime(LocalDateTime.now().plusMinutes(5));
+
+        // 向Redis中插入准备执行的task
+        if (taskinfos.size() > 0) {
+            for (Taskinfo taskinfo : taskinfos) {
+                Task task = new Task();
+                BeanUtils.copyProperties(taskinfo, task);
+                task.setExecuteTime(taskinfo.getExecuteTime().toInstant().toEpochMilli());
+                addToRedis(task);
+            }
+        }
+    }
+
+    private Set<String> scanKeys(String pattern) {
+        Set<String> keys = new HashSet<>();
+        ScanOptions scanOptions = ScanOptions.scanOptions().match(pattern).build();
+        RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
+        Cursor<byte[]> cursor = connection.scan(scanOptions);
+
+        while (cursor.hasNext()) {
+            String key = new String(cursor.next());
+            keys.add(key);
+        }
+
+        return keys;
     }
 
 }
