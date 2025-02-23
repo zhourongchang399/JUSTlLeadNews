@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author ：Zc
  * @description：TODO
@@ -55,9 +57,11 @@ public class ScheduleClient implements IScheduleClient {
      * @return
      */
     @GetMapping("/api/v1/task/poll/{type}/{priority}")
-    public ResponseResult poll(@PathVariable("type") int type, @PathVariable("priority") int priority) {
-        scheduleService.pullTask(type, priority);
-        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    public ResponseResult pull(@PathVariable("type") int type, @PathVariable("priority") int priority) {
+        log.info("pull task type: {}, priority: {}", type, priority);
+        List<Task> tasks = scheduleService.pullTask(type, priority);
+        log.info("pull tasks: {}", tasks);
+        return ResponseResult.okResult(tasks);
     }
 
 }

@@ -16,7 +16,7 @@ public class IArticleClientFallBack implements IArticleClient {
 
     @Override
     public ResponseResult saveArticle(ArticleDto articleDto) {
-        return ResponseResult.errorResult(AppHttpCodeEnum.SERVER_ERROR);
+        return ResponseResult.okResult(AppHttpCodeEnum.FAIL_PUBLISH_NEWS);
     }
 
 }

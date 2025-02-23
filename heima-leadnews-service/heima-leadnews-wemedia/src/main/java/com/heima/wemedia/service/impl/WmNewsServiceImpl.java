@@ -1,11 +1,9 @@
 package com.heima.wemedia.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.api.schedule.IScheduleClient;
-import com.heima.common.constants.ArticleConstants;
 import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
@@ -15,7 +13,6 @@ import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.schedule.dtos.Task;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
-import com.heima.model.wemedia.pojos.WmMaterial;
 import com.heima.model.wemedia.pojos.WmNews;
 import com.heima.model.wemedia.pojos.WmNewsMaterial;
 import com.heima.utils.common.WmThreadLocalUtil;
@@ -29,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -141,6 +139,25 @@ public class WmNewsServiceImpl implements WmNewsService {
         task.setTaskType(ScheduleConstants.NEWS_AUTO_SCAN_TASK);
         task.setPriority(ScheduleConstants.FIRST_PRIORITY);
         iScheduleClient.addTask(task);
+    }
+
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void consumePublishNewsTaskSchedule() {
+        log.info("执行发布新闻的定时任务！！！");
+        ResponseResult responseResult = iScheduleClient.pull(ScheduleConstants.NEWS_AUTO_SCAN_TASK, ScheduleConstants.FIRST_PRIORITY);
+        if (responseResult != null && responseResult.getCode().equals(200)) {
+            String data = JSON.toJSONString(responseResult.getData());
+            if (data != null) {
+                List<Task> taskList = JSON.parseArray(data, Task.class);
+                for (Task task : taskList) {
+                    log.info("exec task: {}", task);
+                    String parameters = new String(task.getParameters());
+                    WmNewsDto wmNewsDto = JSON.parseObject(parameters, WmNewsDto.class);
+                    // 异步执行文章自动审核
+                    wmAutoScanService.scanNews(wmNewsDto.getId());
+                }
+            }
+        }
     }
 
     private static List<String> getMaterials(WmNewsDto wmNewsDto) {

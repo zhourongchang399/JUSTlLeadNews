@@ -75,6 +75,8 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
             throw new CustomException(AppHttpCodeEnum.NOT_EXIST_NEWS);
         }
 
+        log.info("执行文章自动审核:{}", id);
+
         // 提取文章图文信息
         List<List<String>> textAndImages = getTextAndImages(wmNews);
 
@@ -172,10 +174,11 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
         // 向APP端发起请求
         ResponseResult responseResult = iArticleClient.saveArticle(articleDto);
         if (responseResult != null && responseResult.getCode().equals(200)) {
-            log.info("审核成功！调用app端接口保存文章");
+            log.info("调用app端接口保存文章成功");
         } else {
             throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
         }
+
         // 回调文章ID
         return (Long) responseResult.getData();
     }

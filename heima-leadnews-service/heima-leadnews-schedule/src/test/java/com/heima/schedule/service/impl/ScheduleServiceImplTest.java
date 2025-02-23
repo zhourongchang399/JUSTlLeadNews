@@ -1,5 +1,6 @@
 package com.heima.schedule.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.schedule.dtos.Task;
 import com.heima.schedule.ScheduleApplication;
@@ -14,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,6 +29,22 @@ class ScheduleServiceImplTest {
 
     @Test
     void addTask() {
+        Task task3 = new Task();
+        task3.setTaskType(0);
+        task3.setParameters("此刻".getBytes(StandardCharsets.UTF_8));
+        task3.setPriority(1);
+        LocalDateTime localDateTime3 = LocalDateTime.now();
+        task3.setExecuteTime(localDateTime3.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        scheduleService.addTask(task3);
+
+        Task task4 = new Task();
+        task4.setTaskType(0);
+        task4.setParameters("现在".getBytes(StandardCharsets.UTF_8));
+        task4.setPriority(1);
+        LocalDateTime localDateTime4 = LocalDateTime.now();
+        task4.setExecuteTime(localDateTime4.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        scheduleService.addTask(task4);
+
         Task task = new Task();
         task.setTaskType(0);
         task.setParameters("5分钟后".getBytes(StandardCharsets.UTF_8));
@@ -59,7 +78,10 @@ class ScheduleServiceImplTest {
 
     @Test
     void pullTask(){
-        scheduleService.pullTask(0,1);
+        List<Task> tasks = scheduleService.pullTask(101, 1);
+        String json = JSON.toJSONString(tasks);
+        List<Task> list = JSON.parseArray(json, Task.class);
+        list.stream().forEach(System.out::println);
     }
 
 }

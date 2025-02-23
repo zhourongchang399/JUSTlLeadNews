@@ -78,16 +78,20 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<Task> pullTask(Integer type, Integer priority) {
-        List<Task> tasks = null;
-        String key = type + "_" + priority;
+        List<Task> tasks = new ArrayList<>();
+        String key = ScheduleConstants.CURRENT + type + "_" + priority;
         // 从list中取出对应类型和优先级的队列
-        List<String> range = redisTemplate.opsForList().range(ScheduleConstants.CURRENT + key, 0, -1);
-        for (String s : range) {
-            Task task = JSON.parseObject(s, Task.class);
-            tasks.add(task);
-            // 从taskInfo中删除对应的task并更新taskInfoLog
-            deleteAndUpdateTask(task.getTaskId(), ScheduleConstants.EXECUTED_STATUS);
+        List<String> range = redisTemplate.opsForList().range(key, 0, -1);
+        if (range != null) {
+            for (String s : range) {
+                Task task = JSON.parseObject(s, Task.class);
+                tasks.add(task);
+                // 从taskInfo中删除对应的task并更新taskInfoLog
+                deleteAndUpdateTask(task.getTaskId(), ScheduleConstants.EXECUTED_STATUS);
+            }
         }
+        // 从Redis中删除对应类型和优先级的队列
+        redisTemplate.delete(key);
         return tasks;
     }
 
