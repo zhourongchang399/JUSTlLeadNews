@@ -4,12 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.heima.api.schedule.IScheduleClient;
 import com.heima.common.constants.ArticleConstants;
+import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.schedule.dtos.Task;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.model.wemedia.pojos.WmMaterial;
@@ -25,9 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -50,6 +55,9 @@ public class WmNewsServiceImpl implements WmNewsService {
 
     @Autowired
     private WmAutoScanService wmAutoScanService;
+
+    @Autowired
+    private IScheduleClient iScheduleClient;
 
     final static Integer DEFAULT_PAGE_SIZE = 20;
     final static Integer DEFAULT_PAGE_NUM = 1;
@@ -116,11 +124,23 @@ public class WmNewsServiceImpl implements WmNewsService {
         // 保存文章封面和素材关系
         saveNewsAndMaterialsRelativation(newsId, images, WemediaConstants.WM_COVER_REFERENCE);
 
-        // 文章自动审核
-        wmAutoScanService.scanNews(wmNewsDto.getId());
+        // 发起文章自动审核的延迟任务
+        addPublishNewsTaskToSchedule(wmNewsDto);
+//        wmAutoScanService.scanNews(wmNewsDto.getId());
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Async
+    public void addPublishNewsTaskToSchedule(WmNewsDto wmNewsDto) {
+        log.info("添加发布新闻任务到延迟服务中!!!");
+        Task task = new Task();
+        task.setExecuteTime(wmNewsDto.getPublishTime().toInstant().toEpochMilli());
+        task.setParameters(JSON.toJSONString(wmNewsDto).getBytes(StandardCharsets.UTF_8));
+        task.setTaskType(ScheduleConstants.NEWS_AUTO_SCAN_TASK);
+        task.setPriority(ScheduleConstants.FIRST_PRIORITY);
+        iScheduleClient.addTask(task);
     }
 
     private static List<String> getMaterials(WmNewsDto wmNewsDto) {

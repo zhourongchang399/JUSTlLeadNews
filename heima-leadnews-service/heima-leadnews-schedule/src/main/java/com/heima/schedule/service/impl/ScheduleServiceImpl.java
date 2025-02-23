@@ -143,11 +143,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         // 如果执行时间 lt 当前时间则存入redis的list队列中
         if (executeTime.isBefore(currentTime)) {
+            log.info("添加任务到list中！！！");
             redisTemplate
                     .opsForList()
                     .leftPush(ScheduleConstants.CURRENT + stringJoiner.toString(), JSON.toJSONString(task));
         } else if (executeTime.isAfter(currentTime) && executeTime.isBefore(nextExecuteTime)){
             // 如果执行时间 lt 当前时间 + 预设时间则存入redis的zset中
+            log.info("添加任务到zset中！！！");
             redisTemplate
                     .opsForZSet()
                     .add(ScheduleConstants.FUTURE + stringJoiner.toString(), JSON.toJSONString(task), task.getExecuteTime());
@@ -238,6 +240,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     String current_key = ScheduleConstants.CURRENT + key.split(ScheduleConstants.FUTURE)[1];
                     redisConnection.lPush(current_key.getBytes(StandardCharsets.UTF_8), task.getBytes(StandardCharsets.UTF_8));
                     // 从ZSet中移除
+                    // 因为配置中给value设置了序列化和反序列化，所以需要将获取的task序列化再转byte数值才可以与redis中的数据对应上
                     Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
                     byte[] taskBytes = jsonSerializer.serialize(task);
                     redisConnection.zRem(key.getBytes(StandardCharsets.UTF_8), taskBytes);
