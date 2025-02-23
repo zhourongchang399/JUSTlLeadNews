@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ：Zc
@@ -214,26 +215,45 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Scheduled(cron = "0 0/1 * * * ?")
     public void updateFromFutureToCurrent() throws IOException {
         log.info("执行从ZSet更新到List的定时任务！！！");
-        // 从ZSet中获取预执行任务的key
-        Set<String> scanKeys = scanKeys(ScheduleConstants.FUTURE + "*");
 
-        if (!scanKeys.isEmpty()) {
-            for (String key : scanKeys) {
-                // 从ZSet中获取执行时间在当前时间之前的任务
-                Set<String> paperToExecTask  = redisTemplate.opsForZSet().rangeByScore(key, 0, LocalDateTime
-                        .now()
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli());
+        // 申请Redis分布式锁
+        String token = tryLock(ScheduleConstants.UPDATE_ZSET_TO_LIST_LOCK, 1000L * 30L);
 
-                // 通过pipeline执行插入和移除操作
-                if (!paperToExecTask.isEmpty()) {
-                    log.info("Processing key: {}, tasks to move: {}", key, paperToExecTask.size());
-                    execPipeline(key, paperToExecTask);
+        // token不为空则执行定时任务
+        if (token != null) {
+            // 从ZSet中获取预执行任务的key
+            Set<String> scanKeys = scanKeys(ScheduleConstants.FUTURE + "*");
+
+            if (!scanKeys.isEmpty()) {
+                for (String key : scanKeys) {
+                    // 从ZSet中获取执行时间在当前时间之前的任务
+                    Set<String> paperToExecTask  = redisTemplate.opsForZSet().rangeByScore(key, 0, LocalDateTime
+                            .now()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
+                            .toEpochMilli());
+
+                    // 通过pipeline执行插入和移除操作
+                    if (!paperToExecTask.isEmpty()) {
+                        log.info("Processing key: {}, tasks to move: {}", key, paperToExecTask.size());
+                        execPipeline(key, paperToExecTask);
+                    }
                 }
             }
+        } else {
+            log.info("当前已有服务实例执行该定时任务，当前实例跳过该任务！！！");
         }
 
+    }
+
+    private String tryLock(String lockName, Long time) {
+        log.info("申请Redis分布式锁：{},锁消亡时间：{}",lockName,time);
+        // 生成一个随机token
+        String token = UUID.randomUUID().toString();
+        // 创建一个有消亡时间的和not if exist的键值对
+        Boolean ifAbsent = redisTemplate.opsForValue().setIfAbsent(lockName, token, time, TimeUnit.MILLISECONDS);
+        // 如果创建成功则返回一个随机token
+        return ifAbsent ? token : null;
     }
 
     private void execPipeline(String key, Set<String> paperToExecTask) {

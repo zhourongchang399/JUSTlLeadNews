@@ -1,5 +1,5 @@
 server:
-  port: 51804
+  port: ${applicationServerPort:51804}
 spring:
   application:
     name: leadnews-schedule

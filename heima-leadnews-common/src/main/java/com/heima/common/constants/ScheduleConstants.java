@@ -22,4 +22,6 @@ public class ScheduleConstants {
 
     public static final String FUTURE = "future_";
     public static final String CURRENT = "current_";
+
+    public static final String UPDATE_ZSET_TO_LIST_LOCK = "UPDATE_ZSET_TO_LIST_LOCK";
 }
