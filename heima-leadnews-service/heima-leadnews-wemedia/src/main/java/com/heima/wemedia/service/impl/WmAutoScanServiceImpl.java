@@ -153,7 +153,8 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
         wmNewsMapper.updateNews(needToUpadte);
     }
 
-    private Long saveApArticle(WmNews wmNews) {
+    @Transactional
+    public Long saveApArticle(WmNews wmNews) {
         // 参数拷贝
         ArticleDto articleDto = new ArticleDto();
         BeanUtils.copyProperties(wmNews, articleDto);
@@ -175,6 +176,9 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
         ResponseResult responseResult = iArticleClient.saveArticle(articleDto);
         if (responseResult != null && responseResult.getCode().equals(200)) {
             log.info("调用app端接口保存文章成功");
+            // 发布成功，修改文章状态
+            wmNews.setStatus(WemediaConstants.WM_NEWS_PUBLISHED);
+            wmNewsMapper.updateNews(wmNews);
         } else {
             throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
         }

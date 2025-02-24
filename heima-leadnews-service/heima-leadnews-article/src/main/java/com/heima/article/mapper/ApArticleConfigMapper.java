@@ -6,4 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ApArticleConfigMapper {
     void insert(ApArticleConfig apArticleConfig);
+
+    void update(ApArticleConfig apArticleConfig);
 }

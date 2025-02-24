@@ -17,6 +17,7 @@
             <groupId>com.heima</groupId>
             <artifactId>heima-leadnews-utils</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>

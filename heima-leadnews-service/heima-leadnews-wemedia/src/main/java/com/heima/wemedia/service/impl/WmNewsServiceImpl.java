@@ -7,6 +7,7 @@ import com.heima.api.schedule.IScheduleClient;
 import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
+import com.heima.common.kafka.KafkaService;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,9 @@ public class WmNewsServiceImpl implements WmNewsService {
 
     @Autowired
     private IScheduleClient iScheduleClient;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     final static Integer DEFAULT_PAGE_SIZE = 20;
     final static Integer DEFAULT_PAGE_NUM = 1;
@@ -235,8 +240,17 @@ public class WmNewsServiceImpl implements WmNewsService {
 
         // 修改文章信息
         WmNews needToUpdateNews = new WmNews();
-        BeanUtils.copyProperties(wmNewsDto, needToUpdateNews);
+        needToUpdateNews.setId(wmNewsDto.getId());
+        needToUpdateNews.setEnable(wmNewsDto.getEnable());
         wmNewsMapper.updateNews(needToUpdateNews);
+
+        // 向Kafka发送消息，通知article服务上架或下架文章
+        Map<String, Object> map = new HashMap<>();
+        map.put("articleId", wmNews.getArticleId());
+        map.put("enable", wmNewsDto.getEnable());
+        String jsonString = JSON.toJSONString(map);
+        kafkaService.sendAsync(WemediaConstants.UP_OR_DOWN_ARTICLE_TOPIC, jsonString);
+
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
