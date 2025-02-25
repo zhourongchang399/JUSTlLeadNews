@@ -1,7 +1,7 @@
-package com.heima.app.gateway.filter;
+package com.heima.search.gateway.filter;
 
 
-import com.heima.app.gateway.util.AppJwtUtil;
+import com.heima.search.gateway.util.AppJwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

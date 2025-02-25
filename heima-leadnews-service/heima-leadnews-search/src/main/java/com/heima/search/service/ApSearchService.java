@@ -3,6 +3,7 @@ package com.heima.search.service;
 import com.heima.model.article.dtos.UserSearchDto;
 import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.article.vos.ApArticleSearchVo;
+import com.heima.model.common.dtos.ResponseResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,5 +18,5 @@ public interface ApSearchService {
 
     void initMapping(String mapping) throws IOException;
 
-    List<ApArticleSearchVo> search(UserSearchDto dto) throws IOException;
+    ResponseResult search(UserSearchDto dto) throws IOException;
 }

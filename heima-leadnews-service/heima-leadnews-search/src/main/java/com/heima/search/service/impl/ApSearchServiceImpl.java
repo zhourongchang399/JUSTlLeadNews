@@ -6,8 +6,10 @@ import com.heima.model.article.dtos.UserSearchDto;
 import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
+import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.search.service.ApSearchService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -22,6 +24,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -83,10 +86,10 @@ public class ApSearchServiceImpl implements ApSearchService {
     }
 
     @Override
-    public List<ApArticleSearchVo> search(UserSearchDto dto) throws IOException {
+    public ResponseResult search(UserSearchDto dto) throws IOException {
         // 参数校验
         if (dto == null || dto.getSearchWords() == null || dto.getSearchWords().equals("")) {
-            return Collections.emptyList();
+            return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
         }
 
         // 设置检索条件
@@ -116,12 +119,25 @@ public class ApSearchServiceImpl implements ApSearchService {
 
         // 封装结果
         SearchHit[] hits = searchResponse.getHits().getHits();
-        List<ApArticleSearchVo> apArticleSearchVoList = Arrays.stream(hits)
-                .map(h -> JSON.parseObject(h.getSourceAsString(), ApArticleSearchVo.class))
+        List<Map> apArticleSearchVoList = Arrays.stream(hits)
+                .map(h -> {
+                    Map<String, Object> map = JSON.parseObject(h.getSourceAsString(), Map.class);
+                    //处理高亮
+                    if(h.getHighlightFields() != null && h.getHighlightFields().size() > 0 && h.getHighlightFields().get("title") != null){
+                        Text[] titles = h.getHighlightFields().get("title").getFragments();
+                        String title = StringUtils.join(titles);
+                        //高亮标题
+                        map.put("h_title",title);
+                    }else {
+                        //原始标题
+                        map.put("h_title", map.get("title"));
+                    }
+                    return map;
+                })
                 .collect(Collectors.toList());
 
         // 返回结果
-        return apArticleSearchVoList;
+        return ResponseResult.okResult(apArticleSearchVoList);
     }
 
     private void loadIndex(String mapping) throws IOException {

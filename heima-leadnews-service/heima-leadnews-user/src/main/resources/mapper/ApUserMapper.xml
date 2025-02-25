@@ -6,8 +6,11 @@
     <select id="getByConditions" resultType="com.heima.model.user.pojos.ApUser">
         select * from ap_user
         <where>
-            <if test="phone != phone">
+            <if test="phone != null">
                 and phone = #{phone}
+            </if>
+            <if test="password != null">
+                and password = #{password}
             </if>
         </where>
 

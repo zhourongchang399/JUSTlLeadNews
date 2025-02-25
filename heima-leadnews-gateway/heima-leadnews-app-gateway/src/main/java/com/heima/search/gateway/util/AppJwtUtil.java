@@ -1,4 +1,4 @@
-package com.heima.app.gateway.util;
+package com.heima.search.gateway.util;
 
 import io.jsonwebtoken.*;
 

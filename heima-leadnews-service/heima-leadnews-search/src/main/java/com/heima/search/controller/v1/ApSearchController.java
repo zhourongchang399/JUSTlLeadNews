@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/api/v1/article/search")
 public class ApSearchController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class ApSearchController {
 
     @PostMapping("/search")
     public ResponseResult search(@RequestBody UserSearchDto dto) throws IOException {
-        return ResponseResult.okResult(JSON.toJSONString(apSearchService.search(dto)));
+        return apSearchService.search(dto);
     }
 
 }

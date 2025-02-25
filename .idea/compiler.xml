@@ -23,6 +23,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="heima-leadnews-apis" target="1.8" />
+      <module name="heima-leadnews-search-gateway" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -40,6 +41,7 @@
       <module name="heima-leadnews-model" options="-parameters" />
       <module name="heima-leadnews-schedule" options="-parameters" />
       <module name="heima-leadnews-search" options="-parameters" />
+      <module name="heima-leadnews-search-gateway" options="-parameters" />
       <module name="heima-leadnews-service" options="-parameters" />
       <module name="heima-leadnews-test" options="-parameters" />
       <module name="heima-leadnews-user" options="-parameters" />
