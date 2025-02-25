@@ -1,14 +1,14 @@
 package com.heima.search.controller.v1;
 
+import com.alibaba.fastjson.JSON;
+import com.heima.model.article.dtos.UserSearchDto;
+import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.search.service.ApSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -37,5 +37,9 @@ public class ApSearchController {
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
+    @PostMapping("/search")
+    public ResponseResult search(@RequestBody UserSearchDto dto) throws IOException {
+        return ResponseResult.okResult(JSON.toJSONString(apSearchService.search(dto)));
+    }
 
 }

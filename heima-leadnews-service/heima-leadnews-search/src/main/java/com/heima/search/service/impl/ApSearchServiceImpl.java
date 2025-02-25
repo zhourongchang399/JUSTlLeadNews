@@ -2,19 +2,20 @@ package com.heima.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.heima.api.article.IArticleClient;
+import com.heima.model.article.dtos.UserSearchDto;
+import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.search.service.ApSearchService;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -22,13 +23,18 @@ import org.elasticsearch.client.indices.GetMappingsRequest;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author ：Zc
@@ -74,6 +80,48 @@ public class ApSearchServiceImpl implements ApSearchService {
             loadIndex(mapping);
         }
 
+    }
+
+    @Override
+    public List<ApArticleSearchVo> search(UserSearchDto dto) throws IOException {
+        // 参数校验
+        if (dto == null || dto.getSearchWords() == null || dto.getSearchWords().equals("")) {
+            return Collections.emptyList();
+        }
+
+        // 设置检索条件
+        SearchRequest searchRequest = new SearchRequest(ARTICLE_INDEX);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .should(QueryBuilders.matchQuery("title", dto.getSearchWords()))
+                .should(QueryBuilders.matchQuery("content", dto.getSearchWords()));
+        sourceBuilder.query(boolQuery);
+
+        // 设置页码和大小
+        sourceBuilder.from(dto.getPageNum());
+        sourceBuilder.size(dto.getPageSize());
+
+        // 设置排序
+        sourceBuilder.sort("publishTime", SortOrder.DESC);
+
+        // 设置高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("title").preTags("<em>").postTags("</em>"); // 设置title高亮
+        highlightBuilder.field("content").preTags("<em>").postTags("</em>"); // 设置content高亮
+        sourceBuilder.highlighter(highlightBuilder);
+        searchRequest.source(sourceBuilder);
+
+        // 执行查询
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+
+        // 封装结果
+        SearchHit[] hits = searchResponse.getHits().getHits();
+        List<ApArticleSearchVo> apArticleSearchVoList = Arrays.stream(hits)
+                .map(h -> JSON.parseObject(h.getSourceAsString(), ApArticleSearchVo.class))
+                .collect(Collectors.toList());
+
+        // 返回结果
+        return apArticleSearchVoList;
     }
 
     private void loadIndex(String mapping) throws IOException {
