@@ -19,4 +19,9 @@ public class IArticleClientFallBack implements IArticleClient {
         return ResponseResult.okResult(AppHttpCodeEnum.FAIL_PUBLISH_NEWS);
     }
 
+    @Override
+    public ResponseResult loadArticle() {
+        return ResponseResult.okResult(AppHttpCodeEnum.DATA_NOT_EXIST);
+    }
+
 }

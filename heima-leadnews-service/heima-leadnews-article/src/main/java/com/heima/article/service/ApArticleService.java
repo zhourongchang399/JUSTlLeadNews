@@ -19,4 +19,6 @@ public interface ApArticleService {
     public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto);
 
     ResponseResult saveArticle(ArticleDto articleDto);
+
+    ResponseResult loadArticle();
 }

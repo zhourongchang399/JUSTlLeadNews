@@ -5,6 +5,7 @@ import com.heima.article.service.ApArticleService;
 import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.common.dtos.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,12 @@ public class ArticleClient implements IArticleClient {
     @PostMapping("/api/v1/article/save")
     public ResponseResult saveArticle(ArticleDto articleDto) {
         return apArticleService.saveArticle(articleDto);
+    }
+
+    @Override
+    @GetMapping("/api/v1/article/loadArticle")
+    public ResponseResult loadArticle() {
+        return apArticleService.loadArticle();
     }
 
 }

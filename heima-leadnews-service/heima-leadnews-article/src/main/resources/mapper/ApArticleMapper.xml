@@ -19,6 +19,28 @@
         where id = #{id}
     </update>
 
+    <resultMap id="articleSearchVo" type="com.heima.model.article.vos.ApArticleSearchVo">
+        <result column="id" property="id"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="layout" property="layout"/>
+        <result column="images" property="images"/>
+        <result column="static_url" property="staticUrl"/>
+        <result column="author_id" property="authorId"/>
+        <result column="author_Name" property="authorName"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+    </resultMap>
+
+    <select id="loadArticle" resultMap="articleSearchVo">
+        select ap_article.*, ap_article_content.content as "content"
+        from ap_article, ap_article_content, ap_article_config
+                 where
+                     ap_article.id = ap_article_content.article_id and
+                     ap_article.id = ap_article_config.article_id and
+                     ap_article_config.is_delete = 0 and
+                     ap_article_config.is_down = 0
+    </select>
+
     <select id="pageQueryApArticle" resultType="com.heima.model.article.pojos.ApArticle">
         select ap_article.* from ap_article LEFT JOIN ap_article_config ON ap_article.id = ap_article_config.article_id
         <where>

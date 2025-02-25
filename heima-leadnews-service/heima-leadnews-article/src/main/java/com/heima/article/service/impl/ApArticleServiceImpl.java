@@ -1,5 +1,6 @@
 package com.heima.article.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -16,6 +17,7 @@ import com.heima.model.article.dtos.ArticleHomeDto;
 import com.heima.model.article.pojos.ApArticle;
 import com.heima.model.article.pojos.ApArticleConfig;
 import com.heima.model.article.pojos.ApArticleContent;
+import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import freemarker.template.Configuration;
@@ -130,6 +132,12 @@ public class ApArticleServiceImpl implements ApArticleService {
 
         // 操作成功，返回文章ID
         return ResponseResult.okResult(articleId);
+    }
+
+    @Override
+    public ResponseResult loadArticle() {
+        List<ApArticleSearchVo> apArticleSearchVoList = apArticleMapper.loadArticle();
+        return ResponseResult.okResult(JSON.toJSONString(apArticleSearchVoList));
     }
 
 
