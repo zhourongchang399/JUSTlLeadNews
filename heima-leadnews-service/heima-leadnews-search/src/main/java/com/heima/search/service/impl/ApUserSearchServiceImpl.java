@@ -1,7 +1,12 @@
 package com.heima.search.service.impl;
 
+import com.heima.model.article.dtos.HistorySearchDto;
 import com.heima.model.article.pojos.ApUserSearch;
+import com.heima.model.common.dtos.ResponseResult;
+import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.search.service.ApUserSearchService;
+import com.heima.utils.common.WmThreadLocalUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +27,7 @@ import java.util.List;
  * @date ：2025/2/25 21:58
  */
 @Service
+@Slf4j
 public class ApUserSearchServiceImpl implements ApUserSearchService {
 
     private static final Integer MAX_SIZE = 10;
@@ -42,6 +49,7 @@ public class ApUserSearchServiceImpl implements ApUserSearchService {
         query.addCriteria(Criteria.where("userId").is(userId));
         ApUserSearch one = mongoTemplate.findOne(query, ApUserSearch.class);
         if (one != null) {
+            log.info("搜索词已存在:{}", one);
             // 存在则更新创建时间
             Query queryUpdate = new Query();
             queryUpdate.addCriteria(Criteria.where("userId").is(userId));
@@ -57,16 +65,50 @@ public class ApUserSearchServiceImpl implements ApUserSearchService {
             apUserSearch.setKeyword(keyword);
             apUserSearch.setCreatedTime(new Date());
             if (count >= MAX_SIZE) {
+                log.info("搜索词历史记录超过数量:{}", count);
                 Query query1 = new Query(Criteria.where("userId").is(userId));
                 query1.with(Sort.by(Sort.Direction.ASC,"createdTime"));
                 List<ApUserSearch> apUserSearches = mongoTemplate.find(query1, ApUserSearch.class);
-                mongoTemplate.findAndReplace(new Query(Criteria.where("userId").is(apUserSearches.get(0))), apUserSearch);
+                mongoTemplate.findAndReplace(new Query(Criteria.where("userId").is(apUserSearches.get(0).getUserId())), apUserSearch);
             } else {
                 // 否则新增数据
+                log.info("新增搜索词历史记录:{}", apUserSearch.toString());
                 mongoTemplate.insert(apUserSearch);
             }
         }
 
+    }
+
+    @Override
+    public ResponseResult loadSearchHistory() {
+        // 获取userId
+        Integer userId = WmThreadLocalUtil.getCurrentId();
+
+        // 判断userId
+        List<ApUserSearch> apUserSearches = new ArrayList<>();
+        if (userId != null) {
+            apUserSearches = mongoTemplate.find(Query.query(Criteria.where("userId").is(userId)).with(Sort.by(Sort.Direction.DESC, "createTime")), ApUserSearch.class);
+        }
+
+        // 返回结果
+        return ResponseResult.okResult(apUserSearches);
+    }
+
+    @Override
+    public ResponseResult deleteSearchHistory(HistorySearchDto historySearchDto) {
+        // 参数校验
+       if (historySearchDto == null) {
+           return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+       }
+
+        // 获取userId
+        Integer userId = WmThreadLocalUtil.getCurrentId();
+        if (userId != null) {
+           mongoTemplate.remove(Query.query(Criteria.where("userId").is(userId).and("id").is(historySearchDto.getId())), ApUserSearch.class);
+        }
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
 }
