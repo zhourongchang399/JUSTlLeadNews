@@ -3,6 +3,7 @@ package com.heima.article.listener;
 import com.alibaba.fastjson.JSON;
 import com.heima.article.service.ApArticleConfigService;
 import com.heima.article.service.ApArticleService;
+import com.heima.common.constants.KafkaConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.model.article.pojos.ApArticleConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -27,7 +28,7 @@ public class ArtilceIsDownListener {
     @Autowired
     private ApArticleConfigService apArticleConfigService;
 
-    @KafkaListener(topics = WemediaConstants.UP_OR_DOWN_ARTICLE_TOPIC)
+    @KafkaListener(topics = KafkaConstants.UP_OR_DOWN_ARTICLE_TOPIC)
     public void upOrDownArticle(ConsumerRecord<String, String> record) {
         String value = record.value();
         if (value != null) {

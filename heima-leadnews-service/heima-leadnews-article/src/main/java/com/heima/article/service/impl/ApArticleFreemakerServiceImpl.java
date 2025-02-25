@@ -1,5 +1,6 @@
 package com.heima.article.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.heima.aliyunOSS.service.AliOssService;
 import com.heima.article.mapper.ApArticleConfigMapper;
@@ -7,8 +8,12 @@ import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
 import com.heima.article.service.ApArticleFreemakerService;
 import com.heima.article.service.ApArticleService;
+import com.heima.common.constants.KafkaConstants;
+import com.heima.common.constants.ScheduleConstants;
+import com.heima.common.kafka.KafkaService;
 import com.heima.model.article.pojos.ApArticle;
 import com.heima.model.article.pojos.ApArticleContent;
+import com.heima.model.article.vos.ApArticleSearchVo;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +48,9 @@ public class ApArticleFreemakerServiceImpl implements ApArticleFreemakerService 
 
     @Autowired
     private AliOssService aliOssService;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     // 异步生成静态文件
     @Async
@@ -68,6 +77,14 @@ public class ApArticleFreemakerServiceImpl implements ApArticleFreemakerService 
             article.setId(apArticleContent.getArticleId());
             article.setStaticUrl(path);
             apArticleMapper.updateById(article);
+
+            // 查询文章信息
+            List<ApArticleSearchVo> apArticleSearchVoList = apArticleMapper.loadArticle(articleId);
+            if (apArticleSearchVoList != null && apArticleSearchVoList.size() > 0) {
+                // 向kafka发送消息，执行更新elasticsearch的文章index
+                ApArticleSearchVo apArticleSearchVo = apArticleSearchVoList.get(0);
+                kafkaService.sendAsync(KafkaConstants.UPDATE_ELASTIC_SEARCH_APP_ARTICLE_TOPIC, JSON.toJSONString(apArticleSearchVo));
+            }
 
             System.out.println("static_path:" + path);
         }

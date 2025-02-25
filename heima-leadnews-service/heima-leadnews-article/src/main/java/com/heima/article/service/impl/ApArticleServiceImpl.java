@@ -136,7 +136,7 @@ public class ApArticleServiceImpl implements ApArticleService {
 
     @Override
     public ResponseResult loadArticle() {
-        List<ApArticleSearchVo> apArticleSearchVoList = apArticleMapper.loadArticle();
+        List<ApArticleSearchVo> apArticleSearchVoList = apArticleMapper.loadArticle(null);
         return ResponseResult.okResult(JSON.toJSONString(apArticleSearchVoList));
     }
 

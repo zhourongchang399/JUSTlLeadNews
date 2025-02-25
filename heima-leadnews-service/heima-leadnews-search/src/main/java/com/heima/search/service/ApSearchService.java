@@ -19,4 +19,6 @@ public interface ApSearchService {
     void initMapping(String mapping) throws IOException;
 
     ResponseResult search(UserSearchDto dto) throws IOException;
+
+    void insertArticle(ApArticleSearchVo apArticleSearchVo) throws IOException;
 }

@@ -18,5 +18,6 @@ public interface ApArticleMapper {
 
     void insertArticle(ApArticle apArticle);
 
-    List<ApArticleSearchVo> loadArticle();
+    List<ApArticleSearchVo> loadArticle(@Param("articleId") Long articleId);
+
 }

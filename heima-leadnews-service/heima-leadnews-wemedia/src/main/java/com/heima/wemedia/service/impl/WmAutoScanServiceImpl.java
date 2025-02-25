@@ -80,7 +80,7 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
         // 提取文章图文信息
         List<List<String>> textAndImages = getTextAndImages(wmNews);
 
-        Short status = WemediaConstants.WM_NEWS_PASS_CHECK;
+        Short status = WemediaConstants.WM_NEWS_PUBLISHED;
         String reason = WemediaConstants.CHECK_SUCCEED;
 
         // 文章审核
@@ -100,7 +100,7 @@ public class WmAutoScanServiceImpl implements WmAutoScanService {
 
         // 调用APP端保存审核通过的文章
         Long articleId = null;
-        if (status.equals(WemediaConstants.WM_NEWS_PASS_CHECK)) {
+        if (status.equals(WemediaConstants.WM_NEWS_PUBLISHED)) {
             articleId = saveApArticle(wmNews);
         }
 

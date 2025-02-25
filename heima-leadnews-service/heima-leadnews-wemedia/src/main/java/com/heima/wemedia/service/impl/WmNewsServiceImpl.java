@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.api.schedule.IScheduleClient;
+import com.heima.common.constants.KafkaConstants;
 import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
@@ -135,7 +136,6 @@ public class WmNewsServiceImpl implements WmNewsService {
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
-    @Async
     public void addPublishNewsTaskToSchedule(WmNewsDto wmNewsDto) {
         log.info("添加发布新闻任务到延迟服务中!!!");
         Task task = new Task();
@@ -249,7 +249,7 @@ public class WmNewsServiceImpl implements WmNewsService {
         map.put("articleId", wmNews.getArticleId());
         map.put("enable", wmNewsDto.getEnable());
         String jsonString = JSON.toJSONString(map);
-        kafkaService.sendAsync(WemediaConstants.UP_OR_DOWN_ARTICLE_TOPIC, jsonString);
+        kafkaService.sendAsync(KafkaConstants.UP_OR_DOWN_ARTICLE_TOPIC, jsonString);
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }

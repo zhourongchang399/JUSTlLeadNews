@@ -140,6 +140,17 @@ public class ApSearchServiceImpl implements ApSearchService {
         return ResponseResult.okResult(apArticleSearchVoList);
     }
 
+    @Override
+    public void insertArticle(ApArticleSearchVo searchVo) throws IOException {
+        // 构建请求
+        IndexRequest indexRequest = new IndexRequest(ARTICLE_INDEX);
+        indexRequest.id(String.valueOf(searchVo.getId()))
+                .source(JSON.toJSONString(searchVo), XContentType.JSON);
+
+        // 向ES发送请求
+        restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+    }
+
     private void loadIndex(String mapping) throws IOException {
         // 查询文章信息
         ResponseResult responseResult = articleClient.loadArticle();

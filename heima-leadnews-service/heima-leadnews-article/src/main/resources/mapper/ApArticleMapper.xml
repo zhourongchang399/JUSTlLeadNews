@@ -34,11 +34,15 @@
     <select id="loadArticle" resultMap="articleSearchVo">
         select ap_article.*, ap_article_content.content as "content"
         from ap_article, ap_article_content, ap_article_config
-                 where
-                     ap_article.id = ap_article_content.article_id and
-                     ap_article.id = ap_article_config.article_id and
-                     ap_article_config.is_delete = 0 and
-                     ap_article_config.is_down = 0
+        <where>
+            ap_article.id = ap_article_content.article_id and
+            ap_article.id = ap_article_config.article_id and
+            ap_article_config.is_delete = 0 and
+            ap_article_config.is_down = 0
+            <if test="articleId != null">
+                and ap_article.id = #{articleId}
+            </if>
+        </where>
     </select>
 
     <select id="pageQueryApArticle" resultType="com.heima.model.article.pojos.ApArticle">
