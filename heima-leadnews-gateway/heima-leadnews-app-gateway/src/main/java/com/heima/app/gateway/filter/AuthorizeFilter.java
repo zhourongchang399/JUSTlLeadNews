@@ -1,7 +1,7 @@
-package com.heima.search.gateway.filter;
+package com.heima.app.gateway.filter;
 
 
-import com.heima.search.gateway.util.AppJwtUtil;
+import com.heima.app.gateway.util.AppJwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 public class AuthorizeFilter implements Ordered, GlobalFilter {
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         //1.获取request和response对象
@@ -29,7 +30,6 @@ public class AuthorizeFilter implements Ordered, GlobalFilter {
             //放行
             return chain.filter(exchange);
         }
-
 
         //3.获取token
         String token = request.getHeaders().getFirst("token");
@@ -48,6 +48,15 @@ public class AuthorizeFilter implements Ordered, GlobalFilter {
             if(result == 1 || result  == 2){
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return response.setComplete();
+            } else {
+                //获取用户信息
+                Object userId = claimsBody.get("id");
+                //存入header
+                ServerHttpRequest serverHttpRequest = request.mutate().headers(httpHeaders -> {
+                    httpHeaders.add("userId", userId + "");
+                }).build();
+                //重置header
+                exchange.mutate().request(serverHttpRequest).build();
             }
         }catch (Exception e){
             e.printStackTrace();

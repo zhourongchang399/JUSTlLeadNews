@@ -8,6 +8,8 @@ import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.search.service.ApSearchService;
+import com.heima.search.service.ApUserSearchService;
+import com.heima.utils.common.WmThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -56,6 +58,9 @@ public class ApSearchServiceImpl implements ApSearchService {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
+    @Autowired
+    private ApUserSearchService apUserSearchService;
+
     @Override
     public void getMappingInfo(String mapping) throws IOException {
         GetRequest getRequest = new GetRequest(mapping, "_all");
@@ -90,6 +95,16 @@ public class ApSearchServiceImpl implements ApSearchService {
         // 参数校验
         if (dto == null || dto.getSearchWords() == null || dto.getSearchWords().equals("")) {
             return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+        }
+
+        // 获取当前用户的userId
+        Integer userId = WmThreadLocalUtil.getCurrentId();
+
+        // 判断是否登录
+        if (userId != null && dto.getFromIndex() == 0) {
+            // 更新搜索词历史记录
+            log.info("userId:{}, searchWord:{}", userId, dto.getSearchWords());
+            apUserSearchService.insert(dto.getSearchWords(), userId);
         }
 
         // 设置检索条件
