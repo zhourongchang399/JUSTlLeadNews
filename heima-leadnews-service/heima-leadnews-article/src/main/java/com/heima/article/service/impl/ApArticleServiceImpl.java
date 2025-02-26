@@ -1,10 +1,8 @@
 package com.heima.article.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.heima.aliyunOSS.service.AliOssService;
 import com.heima.article.mapper.ApArticleConfigMapper;
 import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
@@ -20,23 +18,16 @@ import com.heima.model.article.pojos.ApArticleContent;
 import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author ：Zc
@@ -89,9 +80,9 @@ public class ApArticleServiceImpl implements ApArticleService {
         }
 
         log.info(articleHomeDto.toString());
-        PageHelper.startPage(0,articleHomeDto.getSize());
+        PageHelper.startPage(1,articleHomeDto.getSize());
         Page<ApArticle> apArticlePage = apArticleMapper.pageQueryApArticle(type, articleHomeDto);
-        log.info("查询到{}条数据！", apArticlePage.getTotal());
+        log.info("查询到{}条数据！{}", apArticlePage.getTotal(), apArticlePage.getResult());
 
         return apArticlePage.getResult();
     }

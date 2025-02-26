@@ -1,12 +1,10 @@
 package com.heima.search.service;
 
 import com.heima.model.article.dtos.UserSearchDto;
-import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author ：Zc

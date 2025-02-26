@@ -2,8 +2,8 @@ package com.heima.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.heima.api.article.IArticleClient;
+import com.heima.common.constants.SearchConstats;
 import com.heima.model.article.dtos.UserSearchDto;
-import com.heima.model.article.pojos.ApUserSearch;
 import com.heima.model.article.vos.ApArticleSearchVo;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
@@ -50,8 +50,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ApSearchServiceImpl implements ApSearchService {
 
-    private static final String ARTICLE_INDEX = "app_article_info";
-
     @Autowired
     private IArticleClient articleClient;
 
@@ -76,7 +74,7 @@ public class ApSearchServiceImpl implements ApSearchService {
         if (getMappingsResponse == null) {
             // 创建mapping
             PutMappingRequest putMappingRequest = new PutMappingRequest(mapping);
-            putMappingRequest.source(MAPPING_TEMPLATE, XContentType.JSON);
+            putMappingRequest.source(SearchConstats.MAPPING_TEMPLATE, XContentType.JSON);
             AcknowledgedResponse putMappingResponse = restHighLevelClient.indices().putMapping(putMappingRequest, RequestOptions.DEFAULT);
         } else {
             // 清空文档
@@ -84,7 +82,7 @@ public class ApSearchServiceImpl implements ApSearchService {
             DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
         }
 
-        if (mapping.equals(ARTICLE_INDEX)) {
+        if (mapping.equals(SearchConstats.ARTICLE_INDEX)) {
             loadIndex(mapping);
         }
 
@@ -108,7 +106,7 @@ public class ApSearchServiceImpl implements ApSearchService {
         }
 
         // 设置检索条件
-        SearchRequest searchRequest = new SearchRequest(ARTICLE_INDEX);
+        SearchRequest searchRequest = new SearchRequest(SearchConstats.ARTICLE_INDEX);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                 .should(QueryBuilders.matchQuery("title", dto.getSearchWords()))
@@ -158,7 +156,7 @@ public class ApSearchServiceImpl implements ApSearchService {
     @Override
     public void insertArticle(ApArticleSearchVo searchVo) throws IOException {
         // 构建请求
-        IndexRequest indexRequest = new IndexRequest(ARTICLE_INDEX);
+        IndexRequest indexRequest = new IndexRequest(SearchConstats.ARTICLE_INDEX);
         indexRequest.id(String.valueOf(searchVo.getId()))
                 .source(JSON.toJSONString(searchVo), XContentType.JSON);
 
@@ -194,43 +192,5 @@ public class ApSearchServiceImpl implements ApSearchService {
         }
         restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
     }
-
-    private static final String MAPPING_TEMPLATE = "{\n" +
-            "    \"mappings\":{\n" +
-            "        \"properties\":{\n" +
-            "            \"id\":{\n" +
-            "                \"type\":\"long\"\n" +
-            "            },\n" +
-            "            \"publishTime\":{\n" +
-            "                \"type\":\"date\"\n" +
-            "            },\n" +
-            "            \"layout\":{\n" +
-            "                \"type\":\"integer\"\n" +
-            "            },\n" +
-            "            \"images\":{\n" +
-            "                \"type\":\"keyword\",\n" +
-            "                \"index\": false\n" +
-            "            },\n" +
-            "            \"staticUrl\":{\n" +
-            "                \"type\":\"keyword\",\n" +
-            "                \"index\": false\n" +
-            "            },\n" +
-            "            \"authorId\": {\n" +
-            "                \"type\": \"long\"\n" +
-            "            },\n" +
-            "            \"authorName\": {\n" +
-            "                \"type\": \"text\"\n" +
-            "            },\n" +
-            "            \"title\":{\n" +
-            "                \"type\":\"text\",\n" +
-            "                \"analyzer\":\"ik_smart\"\n" +
-            "            },\n" +
-            "            \"content\":{\n" +
-            "                \"type\":\"text\",\n" +
-            "                \"analyzer\":\"ik_smart\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "}";
 
 }

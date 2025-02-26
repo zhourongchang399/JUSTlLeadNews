@@ -69,7 +69,7 @@ public class ApUserSearchServiceImpl implements ApUserSearchService {
                 Query query1 = new Query(Criteria.where("userId").is(userId));
                 query1.with(Sort.by(Sort.Direction.ASC,"createdTime"));
                 List<ApUserSearch> apUserSearches = mongoTemplate.find(query1, ApUserSearch.class);
-                mongoTemplate.findAndReplace(new Query(Criteria.where("userId").is(apUserSearches.get(0).getUserId())), apUserSearch);
+                mongoTemplate.findAndReplace(new Query(Criteria.where("id").is(apUserSearches.get(0).getId())), apUserSearch);
             } else {
                 // 否则新增数据
                 log.info("新增搜索词历史记录:{}", apUserSearch.toString());
@@ -87,7 +87,7 @@ public class ApUserSearchServiceImpl implements ApUserSearchService {
         // 判断userId
         List<ApUserSearch> apUserSearches = new ArrayList<>();
         if (userId != null) {
-            apUserSearches = mongoTemplate.find(Query.query(Criteria.where("userId").is(userId)).with(Sort.by(Sort.Direction.DESC, "createTime")), ApUserSearch.class);
+            apUserSearches = mongoTemplate.find(Query.query(Criteria.where("userId").is(userId)).with(Sort.by(Sort.Direction.DESC, "createdTime")), ApUserSearch.class);
         }
 
         // 返回结果
