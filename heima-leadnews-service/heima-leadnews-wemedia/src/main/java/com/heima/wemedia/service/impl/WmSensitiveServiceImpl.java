@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -91,6 +88,30 @@ public class WmSensitiveServiceImpl implements WmSensitiveService {
 
         // 返回结果
         return pageResponseResult;
+    }
+
+    @Override
+    @Transactional
+    public ResponseResult save(WmSensitive wmSensitive) {
+        // 参数校验
+        if (wmSensitive == null || wmSensitive.getSensitives() == null || wmSensitive.getSensitives().isEmpty()) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询是否存在
+        WmSensitive selectedWmSensitive = wmSensitiveMapper.selectOne(wmSensitive);
+        if (selectedWmSensitive != null) {
+            // 存在，则直接返回结果
+            throw new CustomException(AppHttpCodeEnum.DATA_EXIST);
+        }
+
+        // 不存在，则新增敏感词
+        wmSensitive.setId(null);
+        wmSensitive.setCreatedTime(new Date());
+        wmSensitiveMapper.insert(wmSensitive);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
 }

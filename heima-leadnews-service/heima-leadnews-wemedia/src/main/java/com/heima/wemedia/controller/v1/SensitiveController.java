@@ -2,6 +2,7 @@ package com.heima.wemedia.controller.v1;
 
 import com.heima.model.admin.dtos.SensitiveDto;
 import com.heima.model.common.dtos.ResponseResult;
+import com.heima.model.wemedia.pojos.WmSensitive;
 import com.heima.wemedia.service.WmSensitiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,11 @@ public class SensitiveController {
     @PostMapping("/list")
     public ResponseResult list(@RequestBody SensitiveDto sensitiveDto) {
         return wmSensitiveService.list(sensitiveDto);
+    }
+
+    @PostMapping("/save")
+    public ResponseResult save(@RequestBody WmSensitive wmSensitive) {
+        return wmSensitiveService.save(wmSensitive);
     }
 
 }

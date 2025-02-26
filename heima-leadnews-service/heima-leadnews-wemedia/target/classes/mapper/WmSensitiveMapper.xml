@@ -2,6 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.wemedia.mapper.WmSensitiveMapper">
 
+    <insert id="insert">
+        insert into wm_sensitive(sensitives, created_time)
+        value (#{sensitives}, #{createdTime})
+    </insert>
+
     <select id="findAll" resultType="com.heima.model.wemedia.pojos.WmSensitive">
         select * from wm_sensitive
     </select>
@@ -11,6 +16,18 @@
         <where>
             <if test="sensitives != null">
                 sensitives like CONCAT("%",#{sensitives},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne" resultType="com.heima.model.wemedia.pojos.WmSensitive">
+        select * from wm_sensitive
+        <where>
+            <if test="sensitives != null">
+                sensitives = #{sensitives}
+            </if>
+            <if test="id != null">
+                and id = #{id}
             </if>
         </where>
     </select>

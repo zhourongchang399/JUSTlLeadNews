@@ -11,4 +11,8 @@ public interface WmSensitiveMapper {
     Page<WmSensitive> list(WmSensitive wmSensitive);
 
     List<WmSensitive> findAll();
+
+    WmSensitive selectOne(WmSensitive wmSensitive);
+
+    void insert(WmSensitive wmSensitive);
 }
