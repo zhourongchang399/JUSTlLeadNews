@@ -5,4 +5,8 @@ import com.heima.model.common.dtos.ResponseResult;
 
 public interface ApUserAuthService {
     ResponseResult list(AuthDto authDto);
+
+    ResponseResult authFial(AuthDto authDto);
+
+    ResponseResult authPass(AuthDto authDto);
 }

@@ -57,4 +57,9 @@ public class WmUserServiceImpl implements WmUserService {
             return ResponseResult.errorResult(AppHttpCodeEnum.LOGIN_PASSWORD_ERROR);
         }
     }
+
+    @Override
+    public void insert(WmUser wmUser) {
+        wmUserMapper.insert(wmUser);
+    }
 }

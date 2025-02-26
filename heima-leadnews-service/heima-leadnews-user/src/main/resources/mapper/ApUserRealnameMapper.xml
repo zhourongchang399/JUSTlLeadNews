@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.user.mapper.ApUserRealnameMapper">
+    <update id="update">
+        update ap_user_realname
+        <set>
+            <if test="reason != null">
+                reason = #{reason},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 
     <select id="list" resultType="com.heima.model.admin.pojos.ApUserRealname">
         select * from ap_user_realname
@@ -10,6 +25,11 @@
             </if>
         </where>
         order by id asc
+    </select>
+
+    <select id="getById" resultType="com.heima.model.admin.pojos.ApUserRealname">
+        select * from ap_user_realname
+        where id = #{id}
     </select>
 
 </mapper>

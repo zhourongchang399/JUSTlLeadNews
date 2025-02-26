@@ -27,4 +27,14 @@ public class ApUserAuthController {
         return apUserAuthService.list(authDto);
     }
 
+    @PostMapping("/authFail")
+    public ResponseResult authFail(@RequestBody AuthDto authDto) {
+        return apUserAuthService.authFial(authDto);
+    }
+
+    @PostMapping("/authPass")
+    public ResponseResult authPass(@RequestBody AuthDto authDto) {
+        return apUserAuthService.authPass(authDto);
+    }
+
 }

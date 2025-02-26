@@ -14,4 +14,7 @@ public interface ApUserRealnameMapper {
 
     Page<ApUserRealname> list(ApUserRealname apUserRealname);
 
+    ApUserRealname getById(int id);
+
+    void update(ApUserRealname apUserRealname);
 }
