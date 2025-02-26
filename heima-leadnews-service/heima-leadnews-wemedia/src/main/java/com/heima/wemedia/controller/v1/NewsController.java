@@ -45,4 +45,19 @@ public class NewsController {
         return wmNewsService.lsitVo(newsAuthDto);
     }
 
+    @GetMapping("/one_vo/{id}")
+    public ResponseResult getOneVo(@PathVariable("id") Integer id){
+        return wmNewsService.getOneVo(id);
+    }
+
+    @PostMapping("/auth_fail")
+    public ResponseResult authFail(@RequestBody NewsAuthDto newsAuthDto){
+        return wmNewsService.authFail(newsAuthDto);
+    }
+
+    @PostMapping("/auth_pass")
+    public ResponseResult authPass(@RequestBody NewsAuthDto newsAuthDto){
+        return wmNewsService.authPass(newsAuthDto);
+    }
+
 }

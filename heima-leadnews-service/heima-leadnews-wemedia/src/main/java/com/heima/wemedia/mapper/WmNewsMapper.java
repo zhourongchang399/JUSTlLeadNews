@@ -5,6 +5,7 @@ import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.model.wemedia.pojos.WmMaterial;
 import com.heima.model.wemedia.pojos.WmNews;
 import com.heima.model.wemedia.pojos.WmNewsMaterial;
+import com.heima.model.wemedia.vos.WmNewsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,5 +23,7 @@ public interface WmNewsMapper {
 
     WmNews getById(Integer id);
 
-    Page<WmNews> list(WmNews wmNews);
+    Page<WmNewsVo> list(WmNews wmNews);
+
+    WmNewsVo getVoById(Integer id);
 }

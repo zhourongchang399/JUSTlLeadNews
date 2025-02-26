@@ -3,12 +3,14 @@ package com.heima.wemedia.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.heima.api.article.IArticleClient;
 import com.heima.api.schedule.IScheduleClient;
 import com.heima.common.constants.KafkaConstants;
 import com.heima.common.constants.ScheduleConstants;
 import com.heima.common.constants.WemediaConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.common.kafka.KafkaService;
+import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
@@ -16,12 +18,13 @@ import com.heima.model.schedule.dtos.Task;
 import com.heima.model.wemedia.dtos.NewsAuthDto;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
+import com.heima.model.wemedia.pojos.WmChannel;
 import com.heima.model.wemedia.pojos.WmNews;
 import com.heima.model.wemedia.pojos.WmNewsMaterial;
+import com.heima.model.wemedia.pojos.WmUser;
+import com.heima.model.wemedia.vos.WmNewsVo;
 import com.heima.utils.common.WmThreadLocalUtil;
-import com.heima.wemedia.mapper.WmMaterialMapper;
-import com.heima.wemedia.mapper.WmNewsMapper;
-import com.heima.wemedia.mapper.WmNewsMaterialMapper;
+import com.heima.wemedia.mapper.*;
 import com.heima.wemedia.service.WmAutoScanService;
 import com.heima.wemedia.service.WmNewsService;
 import org.slf4j.Logger;
@@ -60,6 +63,15 @@ public class WmNewsServiceImpl implements WmNewsService {
 
     @Autowired
     private IScheduleClient iScheduleClient;
+
+    @Autowired
+    private WmChannelMapper wmChannelMapper;
+
+    @Autowired
+    private IArticleClient iArticleClient;
+
+    @Autowired
+    private WmUserMapper wmUserMapper;
 
     @Autowired
     private KafkaService kafkaService;
@@ -281,7 +293,7 @@ public class WmNewsServiceImpl implements WmNewsService {
         // 开始分页
         PageHelper.startPage(newsAuthDto.getPage(), newsAuthDto.getSize());
         // 开始查询
-        Page<WmNews> wmNewsPage = wmNewsMapper.list(wmNews);
+        Page<WmNewsVo> wmNewsPage = wmNewsMapper.list(wmNews);
 
         // 封装结果
         PageResponseResult pageResponseResult = new PageResponseResult();
@@ -292,6 +304,113 @@ public class WmNewsServiceImpl implements WmNewsService {
 
         // 返回结果
         return pageResponseResult;
+    }
+
+    @Override
+    public ResponseResult getOneVo(Integer id) {
+        // 参数校验
+        if (id == null || id <= 0) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询目标
+        WmNewsVo voById = wmNewsMapper.getVoById(id);
+
+        // 返回结果
+        return ResponseResult.okResult(voById);
+    }
+
+    @Override
+    public ResponseResult authFail(NewsAuthDto newsAuthDto) {
+        // 人工审核
+        auth(newsAuthDto, WemediaConstants.WM_NEWS_FAIL_CHECK);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+
+    }
+
+    @Override
+    public ResponseResult authPass(NewsAuthDto newsAuthDto) {
+        // 参数校验
+        if (newsAuthDto == null || newsAuthDto.getId() < 0) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询目标对象
+        WmNews wmNews = wmNewsMapper.getById(newsAuthDto.getId());
+
+        // 判断目标是否存在
+        if (wmNews == null) {
+            throw new CustomException(AppHttpCodeEnum.NOT_EXIST_NEWS);
+        }
+
+        // 调用APP端保存审核通过的文章
+        Long articleId = null;
+
+        // 参数拷贝
+        ArticleDto articleDto = new ArticleDto();
+        BeanUtils.copyProperties(wmNews, articleDto);
+
+        // 布局
+        articleDto.setLayout(wmNews.getType());
+
+        // 作者
+        WmUser user = wmUserMapper.getByCondition(new WmUser(wmNews.getUserId()));
+        articleDto.setAuthorId(Long.valueOf(user.getId()));
+        articleDto.setAuthorName(user.getName());
+
+        // 频道
+        WmChannel wmChannel = wmChannelMapper.getById(wmNews.getChannelId());
+        articleDto.setChannelId(wmChannel.getId());
+        articleDto.setChannelName(wmChannel.getName());
+
+        // 向APP端发起请求
+        ResponseResult responseResult = iArticleClient.saveArticle(articleDto);
+        if (responseResult != null && responseResult.getCode().equals(200)) {
+            log.info("调用app端接口保存文章成功");
+        } else {
+            throw new CustomException(AppHttpCodeEnum.SERVER_ERROR);
+        }
+
+        articleId = (Long) responseResult.getData();
+
+        // 封装对象
+        WmNews needToUpdateNews = new WmNews();
+        needToUpdateNews.setId(newsAuthDto.getId());
+        needToUpdateNews.setReason("人工审核通过");
+        needToUpdateNews.setArticleId(articleId);
+        needToUpdateNews.setStatus(WemediaConstants.WM_NEWS_PASS_PERSON_CHECK);
+
+        // 执行更新操作
+        wmNewsMapper.updateNews(needToUpdateNews);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    private void auth(NewsAuthDto newsAuthDto, short type) {
+        // 参数校验
+        if (newsAuthDto == null || newsAuthDto.getId() < 0) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询目标对象
+        WmNews wmNews = wmNewsMapper.getById(newsAuthDto.getId());
+
+        // 判断目标是否存在
+        if (wmNews == null) {
+            throw new CustomException(AppHttpCodeEnum.NOT_EXIST_NEWS);
+        }
+
+        // 封装对象
+        WmNews needToUpdateNews = new WmNews();
+        needToUpdateNews.setId(newsAuthDto.getId());
+        needToUpdateNews.setReason(newsAuthDto.getMsg());
+        needToUpdateNews.setStatus(type);
+
+        // 执行更新操作
+        wmNewsMapper.updateNews(needToUpdateNews);
     }
 
     private void saveNewsAndMaterialsRelativation(Integer newsId, List<String> materials, Short type) {

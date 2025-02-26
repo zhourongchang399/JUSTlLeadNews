@@ -15,4 +15,10 @@ public interface WmNewsService {
     ResponseResult downOrUp(WmNewsDto wmNewsDto);
 
     ResponseResult lsitVo(NewsAuthDto newsAuthDto);
+
+    ResponseResult getOneVo(Integer id);
+
+    ResponseResult authFail(NewsAuthDto newsAuthDto);
+
+    ResponseResult authPass(NewsAuthDto newsAuthDto);
 }

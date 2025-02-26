@@ -91,4 +91,24 @@
         where id = #{id}
     </select>
 
+    <select id="list" resultType="com.heima.model.wemedia.vos.WmNewsVo">
+        select wm_news.*, wm_user.name as authorName from wm_news left join wm_user
+        on wm_news.user_id = wm_user.id
+        <where>
+            <if test="title != null">
+                and title like concat("%", #{title}, "%")
+            </if>
+            <if test="status != null">
+                and wm_news.status = #{status}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <select id="getVoById" resultType="com.heima.model.wemedia.vos.WmNewsVo">
+        select wm_news.*, wm_user.name as authorName from wm_news left join wm_user
+        on wm_news.user_id = wm_user.id
+        where wm_news.id = #{id}
+    </select>
+
 </mapper>
