@@ -29,7 +29,8 @@ public enum AppHttpCodeEnum {
     NEED_ADMIND(3001,"需要管理员权限"),
     NOT_PUBLISHED_THEN_NOT_DOWN_OR_UP(501,"当前文章并未发布，不能上下架"),
     NOT_EXIST_NEWS(1002,"文章不存在"),
-    FAIL_PUBLISH_NEWS(201,"文章发布出错，请重试！");
+    FAIL_PUBLISH_NEWS(201,"文章发布出错，请重试！"),
+    NOT_EXIST_USER(1002,"用户不存在");
 
     int code;
     String errorMessage;

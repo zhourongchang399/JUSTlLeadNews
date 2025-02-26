@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.heima.mapper.AdUserMapper">
+
+    <update id="update">
+        update ad_user
+        <set>
+            <if test="adUser.loginTime != null">
+                login_time = #{adUser.loginTime}
+            </if>
+        </set>
+        where id = #{adUser.id}
+    </update>
+
+    <select id="selectOne" resultType="com.heima.model.admin.pojos.AdUser">
+        select * from ad_user
+        where name = #{adUser.name}
+    </select>
+
+</mapper>
