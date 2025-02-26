@@ -13,6 +13,7 @@ import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.schedule.dtos.Task;
+import com.heima.model.wemedia.dtos.NewsAuthDto;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.model.wemedia.pojos.WmNews;
@@ -252,6 +253,45 @@ public class WmNewsServiceImpl implements WmNewsService {
         kafkaService.sendAsync(KafkaConstants.UP_OR_DOWN_ARTICLE_TOPIC, jsonString);
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult lsitVo(NewsAuthDto newsAuthDto) {
+        // 参数校验
+        if (newsAuthDto == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 设置size的上下限
+        if (newsAuthDto.getSize() > 20) {
+            newsAuthDto.setSize(20);
+        } else if (newsAuthDto.getSize() < 5) {
+            newsAuthDto.setSize(5);
+        }
+
+        // 设置page的下限
+        if (newsAuthDto.getPage() <= 0) {
+            newsAuthDto.setPage(1);
+        }
+
+        // 封装对象
+        WmNews wmNews = new WmNews();
+        BeanUtils.copyProperties(newsAuthDto, wmNews);
+
+        // 开始分页
+        PageHelper.startPage(newsAuthDto.getPage(), newsAuthDto.getSize());
+        // 开始查询
+        Page<WmNews> wmNewsPage = wmNewsMapper.list(wmNews);
+
+        // 封装结果
+        PageResponseResult pageResponseResult = new PageResponseResult();
+        pageResponseResult.setCurrentPage(wmNewsPage.getPageNum());
+        pageResponseResult.setTotal((int) wmNewsPage.getTotal());
+        pageResponseResult.setData(wmNewsPage.getResult());
+        pageResponseResult.setSize(wmNewsPage.getPageSize());
+
+        // 返回结果
+        return pageResponseResult;
     }
 
     private void saveNewsAndMaterialsRelativation(Integer newsId, List<String> materials, Short type) {

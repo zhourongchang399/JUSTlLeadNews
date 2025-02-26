@@ -1,6 +1,7 @@
 package com.heima.wemedia.controller.v1;
 
 import com.heima.model.common.dtos.ResponseResult;
+import com.heima.model.wemedia.dtos.NewsAuthDto;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.wemedia.service.WmNewsService;
@@ -37,6 +38,11 @@ public class NewsController {
     @PostMapping("/down_or_up")
     public ResponseResult downOrUpNews(@RequestBody WmNewsDto wmNewsDto){
         return wmNewsService.downOrUp(wmNewsDto);
+    }
+
+    @PostMapping("/list_vo")
+    public ResponseResult listVo(@RequestBody NewsAuthDto newsAuthDto){
+        return wmNewsService.lsitVo(newsAuthDto);
     }
 
 }

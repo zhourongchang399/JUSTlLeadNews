@@ -91,4 +91,17 @@
         where id = #{id}
     </select>
 
+    <select id="list" resultType="com.heima.model.wemedia.pojos.WmNews">
+        select * from wm_news
+        <where>
+            <if test="title != null">
+                and title like concat("%", #{title}, "%")
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+
 </mapper>

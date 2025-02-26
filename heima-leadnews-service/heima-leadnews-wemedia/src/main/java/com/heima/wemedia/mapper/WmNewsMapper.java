@@ -22,4 +22,5 @@ public interface WmNewsMapper {
 
     WmNews getById(Integer id);
 
+    Page<WmNews> list(WmNews wmNews);
 }
