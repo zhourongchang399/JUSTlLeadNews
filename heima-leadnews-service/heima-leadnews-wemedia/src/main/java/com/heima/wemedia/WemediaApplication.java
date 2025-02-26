@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class WemediaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(WemediaApplication.class,args);
+        SpringApplication. run(WemediaApplication.class,args);
     }
 
 }
