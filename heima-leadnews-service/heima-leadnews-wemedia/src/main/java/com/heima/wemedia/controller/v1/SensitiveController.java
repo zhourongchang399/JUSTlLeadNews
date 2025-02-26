@@ -5,10 +5,7 @@ import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.wemedia.pojos.WmSensitive;
 import com.heima.wemedia.service.WmSensitiveService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author ：Zc
@@ -30,6 +27,16 @@ public class SensitiveController {
     @PostMapping("/save")
     public ResponseResult save(@RequestBody WmSensitive wmSensitive) {
         return wmSensitiveService.save(wmSensitive);
+    }
+
+    @DeleteMapping("/del/{id}")
+    public ResponseResult del(@PathVariable Long id) {
+        return wmSensitiveService.delete(id);
+    }
+
+    @PostMapping("/update")
+    public ResponseResult update(@RequestBody WmSensitive wmSensitive) {
+        return wmSensitiveService.update(wmSensitive);
     }
 
 }

@@ -19,4 +19,8 @@ public interface WmSensitiveService {
     ResponseResult list(SensitiveDto sensitiveDto);
 
     ResponseResult save(WmSensitive wmSensitive);
+
+    ResponseResult delete(Long id);
+
+    ResponseResult update(WmSensitive wmSensitive);
 }

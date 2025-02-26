@@ -7,8 +7,18 @@
         value (#{sensitives}, #{createdTime})
     </insert>
 
+    <update id="update">
+        update wm_sensitive set created_time = #{createdTime}, sensitives = #{sensitives}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from wm_sensitive
+        where id = #{id}
+    </delete>
+
     <select id="findAll" resultType="com.heima.model.wemedia.pojos.WmSensitive">
-        select * from wm_sensitive
+        select * from wm_sensitive order by created_time desc
     </select>
 
     <select id="list" resultType="com.heima.model.wemedia.pojos.WmSensitive">
@@ -18,6 +28,7 @@
                 sensitives like CONCAT("%",#{sensitives},"%")
             </if>
         </where>
+        order by created_time desc
     </select>
 
     <select id="selectOne" resultType="com.heima.model.wemedia.pojos.WmSensitive">

@@ -15,4 +15,8 @@ public interface WmSensitiveMapper {
     WmSensitive selectOne(WmSensitive wmSensitive);
 
     void insert(WmSensitive wmSensitive);
+
+    void delete(Long id);
+
+    void update(WmSensitive wmSensitive);
 }

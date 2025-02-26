@@ -114,4 +114,53 @@ public class WmSensitiveServiceImpl implements WmSensitiveService {
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
+    @Override
+    public ResponseResult delete(Long id) {
+        // 参数校验
+        if (id == null || id <= 0) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询该数据是否存在
+        WmSensitive wmSensitive = new WmSensitive();
+        wmSensitive.setId(Integer.valueOf(id.intValue()));
+        WmSensitive selectedOne = wmSensitiveMapper.selectOne(wmSensitive);
+
+        // 不存在，则返回
+        if (selectedOne == null) {
+            throw new CustomException(AppHttpCodeEnum.DATA_NOT_EXIST);
+        }
+
+        // 存在，则删除数据
+        wmSensitiveMapper.delete(id);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult update(WmSensitive wmSensitive) {
+        // 参数校验
+        if (wmSensitive == null || wmSensitive.getId() == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询该数据是否存在
+        WmSensitive findedOne = new WmSensitive();
+        findedOne.setSensitives(wmSensitive.getSensitives());
+        WmSensitive selectedOne = wmSensitiveMapper.selectOne(findedOne);
+
+        // 存在，则返回
+        if (selectedOne != null) {
+            throw new CustomException(AppHttpCodeEnum.DATA_EXIST);
+        }
+
+        // 不存在，则更新结果
+        wmSensitive.setCreatedTime(new Date());
+        wmSensitiveMapper.update(wmSensitive);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
 }
