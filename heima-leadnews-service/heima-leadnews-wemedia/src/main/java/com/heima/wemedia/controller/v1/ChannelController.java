@@ -40,6 +40,9 @@ public class ChannelController {
         return wmChannelService.delete(id);
     }
 
-
+    @PostMapping("/update")
+    public ResponseResult updateChannel(@RequestBody WmChannel wmChannel) {
+        return  wmChannelService.update(wmChannel);
+    }
 
 }

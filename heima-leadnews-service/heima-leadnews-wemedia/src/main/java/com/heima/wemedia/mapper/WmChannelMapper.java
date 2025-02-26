@@ -19,4 +19,8 @@ public interface WmChannelMapper {
     void insert(WmChannel wmChannel);
 
     void delete(Long id);
+
+    void update(WmChannel wmChannel);
+
+    Integer referenceCount(WmChannel updatedOne);
 }

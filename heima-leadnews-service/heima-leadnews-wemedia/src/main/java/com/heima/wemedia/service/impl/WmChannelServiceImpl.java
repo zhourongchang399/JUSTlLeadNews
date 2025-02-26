@@ -127,4 +127,53 @@ public class WmChannelServiceImpl implements WmChannelService {
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
+
+    @Override
+    public ResponseResult update(WmChannel wmChannel) {
+        // 参数校验
+        if (wmChannel == null || wmChannel.getId() == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询被修改的频道信息
+        WmChannel updatedOne = wmChannelMapper.getById(wmChannel.getId());
+
+        // 如果需要停用频道，则判断该频道是否被引用
+        if (wmChannel.getStatus() != null && !wmChannel.getStatus()) {
+            Integer count = wmChannelMapper.referenceCount(updatedOne);
+            if (count > 0) {
+                // 已被引用，不准停用
+                throw new CustomException(AppHttpCodeEnum.CHANNEL_IS_REFERNCE);
+            }
+        }
+
+        // 判断频道是否已经停用
+        if (updatedOne.getStatus()) {
+            if (wmChannel.getStatus() != null && wmChannel.getStatus()) {
+                // 启用同时并未执行停用，则不准编辑
+                throw new CustomException(AppHttpCodeEnum.CHANNEL_IS_ON);
+            }
+        }
+
+        // 判断频道名称是否存在
+        WmChannel findedChannel = new WmChannel();
+        findedChannel.setName(wmChannel.getName());
+        findedChannel.setId(null);
+        WmChannel selectedOne = wmChannelMapper.selectOne(findedChannel);
+        // 判断频道名称是否已存在
+        if (selectedOne != null) {
+            // 判断是否是停用或启用操作
+            if (wmChannel.getStatus() != null && wmChannel.getStatus() == selectedOne.getStatus()) {
+                // 否，则不准编辑
+                throw new CustomException(AppHttpCodeEnum.DATA_EXIST);
+            }
+        }
+
+        // 编辑频道
+        wmChannelMapper.update(wmChannel);
+
+        // 返回结果
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+
+    }
 }

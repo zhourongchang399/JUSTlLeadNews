@@ -13,4 +13,6 @@ public interface WmChannelService {
     ResponseResult save(WmChannel wmChannel);
 
     ResponseResult delete(Long id);
+
+    ResponseResult update(WmChannel wmChannel);
 }

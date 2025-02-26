@@ -6,6 +6,36 @@
         value (#{name}, #{description}, #{isDefault}, #{status}, #{ord}, #{createdTime})
     </insert>
 
+    <update id="update">
+        update wm_channel
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="isDefault != null">
+                is_Default = #{isDefault},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="ord != null">
+                ord = #{ord}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="referenceCount" resultType="Integer">
+        select count(0) from wm_channel, wm_news
+        where wm_channel.id = #{id} and wm_channel.id = wm_news.channel_id
+    </select>
+
     <delete id="delete">
         delete from wm_channel
         where id = #{id}

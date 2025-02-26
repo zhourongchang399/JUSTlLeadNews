@@ -31,7 +31,8 @@ public enum AppHttpCodeEnum {
     NOT_EXIST_NEWS(1002,"文章不存在"),
     FAIL_PUBLISH_NEWS(201,"文章发布出错，请重试"),
     NOT_EXIST_USER(1002,"用户不存！"),
-    CHANNEL_IS_ON(1002, "频道已启用，无法删除");
+    CHANNEL_IS_ON(1002, "频道已启用，无法编辑或删除"),
+    CHANNEL_IS_REFERNCE(1002, "频道已被引用，无法编辑");
 
     int code;
     String errorMessage;
