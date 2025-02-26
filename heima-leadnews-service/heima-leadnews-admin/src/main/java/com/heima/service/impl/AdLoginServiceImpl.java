@@ -7,12 +7,16 @@ import com.heima.model.admin.pojos.AdUser;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.service.AdLoginService;
+import com.heima.utils.common.AppJwtUtil;
 import com.heima.utils.common.MD5Utils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author ：Zc
@@ -57,7 +61,16 @@ public class AdLoginServiceImpl implements AdLoginService {
         selectedUser.setLoginTime(new Date());
         adUserMapper.update(selectedUser);
 
-        return ResponseResult.okResult(selectedUser);
+        // 生成token
+        String token = AppJwtUtil.getToken(Long.valueOf(selectedUser.getId()));
+
+        // 封装结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("user", selectedUser);
+        result.put("token", token);
+
+        // 返回结果
+        return ResponseResult.okResult(result);
     }
 
 }

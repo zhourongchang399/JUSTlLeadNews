@@ -12,6 +12,7 @@
         <module name="heima-leadnews-user" />
         <module name="heima-leadnews-article" />
         <module name="heima-leadnews-admin" />
+        <module name="heima-leadnews-admin-gateway" />
         <module name="heima-leadnews-test" />
         <module name="heima-leadnews-aliyunoss-starter" />
         <module name="heima-leadnews-schedule" />
@@ -31,6 +32,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="heima-leadnews" options="-parameters" />
       <module name="heima-leadnews-admin" options="-parameters" />
+      <module name="heima-leadnews-admin-gateway" options="-parameters" />
       <module name="heima-leadnews-aliyunoss-starter" options="-parameters" />
       <module name="heima-leadnews-apis" options="-parameters" />
       <module name="heima-leadnews-app-gateway" options="-parameters" />

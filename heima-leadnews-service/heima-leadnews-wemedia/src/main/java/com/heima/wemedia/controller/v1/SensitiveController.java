@@ -1,8 +1,8 @@
-package com.heima.controller.v1;
+package com.heima.wemedia.controller.v1;
 
-import com.heima.model.admin.dtos.AdUserDto;
+import com.heima.model.admin.dtos.SensitiveDto;
 import com.heima.model.common.dtos.ResponseResult;
-import com.heima.service.AdLoginService;
+import com.heima.wemedia.service.WmSensitiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,17 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author ：Zc
  * @description：TODO
- * @date ：2025/2/26 16:10
+ * @date ：2025/2/26 16:48
  */
 @RestController
-@RequestMapping("/login")
-public class AdLoginController {
+@RequestMapping("/api/v1/sensitive")
+public class SensitiveController {
 
     @Autowired
-    private AdLoginService adLoginService;
+    private WmSensitiveService wmSensitiveService;
 
-    @PostMapping("/in")
-    public ResponseResult login(@RequestBody AdUserDto adUserDto) {
-        return adLoginService.adminLogin(adUserDto);
+    @PostMapping("/list")
+    public ResponseResult list(@RequestBody SensitiveDto sensitiveDto) {
+        return wmSensitiveService.list(sensitiveDto);
     }
+
 }

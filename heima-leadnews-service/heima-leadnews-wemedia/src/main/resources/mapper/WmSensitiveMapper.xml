@@ -5,4 +5,14 @@
     <select id="findAll" resultType="com.heima.model.wemedia.pojos.WmSensitive">
         select * from wm_sensitive
     </select>
+
+    <select id="list" resultType="com.heima.model.wemedia.pojos.WmSensitive">
+        select * from wm_sensitive
+        <where>
+            <if test="sensitives != null">
+                sensitives like CONCAT("%",#{sensitives},"%")
+            </if>
+        </where>
+    </select>
+
 </mapper>
