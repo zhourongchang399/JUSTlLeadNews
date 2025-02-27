@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.heima.wemedia.mapper.WmUserMapper">
 
+    <insert id="insert">
+        insert into wm_user(ap_user_id, ap_author_id, name, password, salt, nickname, image, location, phone, status, email, type, score, login_time, created_time)
+        value (#{apUserId}, #{apAuthorId}, #{name}, #{password}, #{salt}, #{nickname}, #{image}, #{location}, #{phone}, #{status},
+               #{email}, #{type}, #{score}, #{loginTime}, #{createdTime})
+    </insert>
+
     <select id="getByCondition" resultType="com.heima.model.wemedia.pojos.WmUser">
         select * from wm_user
         <where>
