@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class IWmUserClientFallback implements IWmUserClient {
+
     @Override
     public ResponseResult getWmUserInfo(int id) {
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
+
 }

@@ -113,4 +113,21 @@ public class ApUserBehaviorServiceImpl implements ApUserBehaviorService {
 
     }
 
+    @Override
+    public ResponseResult getFollowAndFansInfo(long authorId, long userId) {
+        // 参数校验
+        if (authorId < 0 || userId < 0) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 查询关注信息
+        QueryWrapper<ApUserFollow> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).eq("follow_id", authorId);
+        ApUserFollow apUserFollow = apUserFollowMapper.selectOne(queryWrapper);
+
+        // 返回结果
+        return ResponseResult.okResult(JSON.toJSONString(apUserFollow));
+
+    }
+
 }

@@ -9,5 +9,9 @@ import com.heima.model.common.dtos.ResponseResult;
  * @date ：2025/2/27 16:00
  */
 public interface ApUserBehaviorService {
+
     ResponseResult userFollow(BehaviorDto behaviorDto);
+
+    ResponseResult getFollowAndFansInfo(long authorId, long userId);
+
 }

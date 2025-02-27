@@ -17,4 +17,5 @@ public interface WmUserService{
     void insert(WmUser wmUser);
 
     ResponseResult getWmUserInfo(int id);
+
 }

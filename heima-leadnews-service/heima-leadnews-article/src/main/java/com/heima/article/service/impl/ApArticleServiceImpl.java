@@ -1,13 +1,17 @@
 package com.heima.article.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.heima.api.apUser.IApUserClient;
 import com.heima.article.mapper.ApArticleConfigMapper;
 import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
+import com.heima.article.mapper.ApCollectionMapper;
 import com.heima.article.service.ApArticleFreemakerService;
 import com.heima.article.service.ApArticleService;
+import com.heima.article.service.ApBehaviorService;
 import com.heima.common.constants.ArticleConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.model.article.dtos.ArticleDto;
@@ -15,13 +19,21 @@ import com.heima.model.article.dtos.ArticleHomeDto;
 import com.heima.model.article.pojos.ApArticle;
 import com.heima.model.article.pojos.ApArticleConfig;
 import com.heima.model.article.pojos.ApArticleContent;
+import com.heima.model.article.pojos.ApCollection;
+import com.heima.model.article.vos.ApArticleBehavior;
 import com.heima.model.article.vos.ApArticleSearchVo;
+import com.heima.model.behavior.dtos.BehaviorDto;
+import com.heima.model.behavior.pojos.Behavior;
+import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.user.pojos.ApUserFollow;
+import com.heima.utils.common.WmThreadLocalUtil;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +63,15 @@ public class ApArticleServiceImpl implements ApArticleService {
 
     @Autowired
     private ApArticleFreemakerService apArticleFreemakerService;
+
+    @Autowired
+    private ApCollectionMapper apCollectionMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private IApUserClient iApUserClient;
 
     @Override
     @Transactional
@@ -131,6 +152,46 @@ public class ApArticleServiceImpl implements ApArticleService {
         return ResponseResult.okResult(JSON.toJSONString(apArticleSearchVoList));
     }
 
+    @Override
+    @Transactional
+    public ResponseResult loadArticleBehavior(BehaviorDto behaviorDto) {
+        // 参数校验
+        if (behaviorDto == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+
+        // 获取用户Id
+        Integer userId = WmThreadLocalUtil.getCurrentId();
+
+        // 判断当前用户是否登录
+        if (userId == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.SUCCESS);
+        }
+
+        // 查询点赞，不喜欢，阅读数量行为数据
+        String o = String.valueOf(redisTemplate.opsForHash().get("0:" + behaviorDto.getArticleId(), String.valueOf(userId)));
+        Behavior behavior = JSON.parseObject(o, Behavior.class);
+
+        // 查询文章收藏行为数据
+        QueryWrapper<ApCollection> apCollectionQueryWrapper = new QueryWrapper<>();
+        apCollectionQueryWrapper.eq("user_id", userId).eq("entry_id", behaviorDto.getArticleId());
+        ApCollection apCollection = apCollectionMapper.selectOne(apCollectionQueryWrapper);
+
+        // 查询关注行为数据
+        ResponseResult followResult = iApUserClient.behavior(behaviorDto.getAuthorId(), userId);
+        ApUserFollow apUserFollow = JSON.parseObject(String.valueOf(followResult.getData()), ApUserFollow.class);
+
+        // 封装对象
+        ApArticleBehavior apArticleBehavior = new ApArticleBehavior();
+        apArticleBehavior.setIsCollection(apCollection != null ? 1 : 0);
+        apArticleBehavior.setIsLike(behavior.getLike());
+        apArticleBehavior.setIsUnlike(behavior.getUnlike());
+        apArticleBehavior.setIsFollow(apUserFollow != null ? 1 : 0);
+
+        // 返回结果
+        return ResponseResult.okResult(apArticleBehavior);
+
+    }
 
     private void modifyArticle(ArticleDto articleDto) {
         // 参数拷贝

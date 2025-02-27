@@ -3,6 +3,7 @@ package com.heima.article.controller.v1;
 import com.heima.article.service.ApArticleService;
 import com.heima.common.constants.ArticleConstants;
 import com.heima.model.article.dtos.ArticleHomeDto;
+import com.heima.model.behavior.dtos.BehaviorDto;
 import com.heima.model.common.dtos.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,6 +43,11 @@ public class ApArticleController {
     @ApiOperation("加载新文章")
     public ResponseResult loadNewArticle(@RequestBody ArticleHomeDto articleHomeDto) {
         return ResponseResult.okResult(apArticleService.pageApArticle(ArticleConstants.LOADTYPE_LOAD_NEW, articleHomeDto));
+    }
+
+    @PostMapping("/load_article_behavior")
+    public ResponseResult loadArticleBehavior(@RequestBody BehaviorDto behaviorDto) {
+        return apArticleService.loadArticleBehavior(behaviorDto);
     }
 
 }
