@@ -12,6 +12,8 @@ public class BehaviorDto {
 
     private long articleId;
 
+    private long authorId;
+
     private int operation;
 
     private Short type;

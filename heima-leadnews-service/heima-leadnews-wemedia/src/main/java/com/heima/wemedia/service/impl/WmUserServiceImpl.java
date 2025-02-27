@@ -2,6 +2,7 @@ package com.heima.wemedia.service.impl;
 
 //import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 //import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.alibaba.fastjson.JSON;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.wemedia.dtos.WmLoginDto;
@@ -62,4 +63,10 @@ public class WmUserServiceImpl implements WmUserService {
     public void insert(WmUser wmUser) {
         wmUserMapper.insert(wmUser);
     }
+
+    @Override
+    public ResponseResult getWmUserInfo(int id) {
+        return ResponseResult.okResult(JSON.toJSONString(wmUserMapper.getById(id)));
+    }
+
 }

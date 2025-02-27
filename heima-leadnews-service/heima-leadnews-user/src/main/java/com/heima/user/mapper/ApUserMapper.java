@@ -10,4 +10,6 @@ public interface ApUserMapper{
     ApUser getByConditions(ApUser queryDbUser);
 
     ApUser getById(Integer userId);
+
+    ApUser getByAuthorId(long authorId);
 }

@@ -10,4 +10,6 @@ public interface WmUserMapper{
     WmUser getByCondition(WmUser wmUser);
 
     void insert(WmUser wmUser);
+
+    WmUser getById(Integer id);
 }

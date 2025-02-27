@@ -23,4 +23,9 @@
         </where>
     </select>
 
+    <select id="getById" resultType="com.heima.model.wemedia.pojos.WmUser">
+        select * from wm_user
+        where id = #{id}
+    </select>
+
 </mapper>

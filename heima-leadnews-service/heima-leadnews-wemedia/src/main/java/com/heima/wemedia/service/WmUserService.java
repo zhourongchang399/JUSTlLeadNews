@@ -15,4 +15,6 @@ public interface WmUserService{
     public ResponseResult login(WmLoginDto dto);
 
     void insert(WmUser wmUser);
+
+    ResponseResult getWmUserInfo(int id);
 }
