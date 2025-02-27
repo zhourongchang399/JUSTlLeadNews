@@ -2,6 +2,8 @@ package com.heima.model.behavior.dtos;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * @author ：Zc
  * @description：TODO
@@ -19,5 +21,9 @@ public class BehaviorDto {
     private Short type;
 
     private long count;
+
+    private long entryId;
+
+    private LocalDateTime publishedTime;
 
 }

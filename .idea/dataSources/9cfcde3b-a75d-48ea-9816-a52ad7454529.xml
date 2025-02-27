@@ -1055,7 +1055,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <CollationName>utf8mb4_unicode_ci</CollationName>
     </schema>
     <schema id="290" parent="1" name="leadnews_article">
-      <LastIntrospectionLocalTimestamp>2025-02-26.07:52:19</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-02-27.13:28:52</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_unicode_ci</CollationName>
     </schema>
     <schema id="291" parent="1" name="leadnews_wemedia">
@@ -1593,7 +1593,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="382" parent="303" name="id">
-      <AutoIncrement>1383828014629179421</AutoIncrement>
+      <AutoIncrement>1383828014629179425</AutoIncrement>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -1724,7 +1724,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="406" parent="304" name="id">
-      <AutoIncrement>1383828014645956637</AutoIncrement>
+      <AutoIncrement>1383828014645956641</AutoIncrement>
       <Comment>主键</Comment>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
@@ -1770,7 +1770,7 @@ DYNAMIC</Options>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="415" parent="305" name="id">
-      <AutoIncrement>1383828014650150942</AutoIncrement>
+      <AutoIncrement>1383828014650150946</AutoIncrement>
       <Comment>主键</Comment>
       <DasType>bigint unsigned|0s</DasType>
       <NotNull>1</NotNull>
@@ -1860,12 +1860,12 @@ name</ColNames>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="432" parent="307" name="entry_id">
+    <column id="432" parent="307" name="user_id">
       <Comment>实体ID</Comment>
       <DasType>int unsigned|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="433" parent="307" name="article_id">
+    <column id="433" parent="307" name="entry_id">
       <Comment>文章ID</Comment>
       <DasType>bigint unsigned|0s</DasType>
       <Position>3</Position>
@@ -1893,8 +1893,8 @@ name</ColNames>
       <Unique>1</Unique>
     </index>
     <index id="438" parent="307" name="idx_user_type">
-      <ColNames>entry_id
-article_id</ColNames>
+      <ColNames>user_id
+entry_id</ColNames>
       <Type>btree</Type>
     </index>
     <key id="439" parent="307" name="PRIMARY">
