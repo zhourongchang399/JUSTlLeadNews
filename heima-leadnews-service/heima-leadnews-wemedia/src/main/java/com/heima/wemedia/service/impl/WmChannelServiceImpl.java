@@ -1,5 +1,6 @@
 package com.heima.wemedia.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.common.exception.CustomException;
@@ -32,7 +33,7 @@ public class WmChannelServiceImpl implements WmChannelService {
     @Override
     public ResponseResult getAllChannels() {
         List<WmChannel> wmChannelList = wmChannelMapper.findAll();
-        return ResponseResult.okResult(wmChannelList);
+        return ResponseResult.okResult(JSON.toJSONString(wmChannelList));
     }
 
     @Override

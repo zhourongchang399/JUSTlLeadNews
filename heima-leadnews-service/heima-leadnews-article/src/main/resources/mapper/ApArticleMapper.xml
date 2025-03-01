@@ -62,4 +62,11 @@
         order by ap_article.publish_time desc
     </select>
 
+    <select id="findAll" resultType="com.heima.model.article.pojos.ApArticle">
+        <![CDATA[ select ap_article.* from ap_article inner join ap_article_config on ap_article.id = ap_article_config.article_id
+        where ap_article_config.is_down = 0
+        and ap_article_config.is_delete = 0
+        and ap_article.publish_time >= #{time,jdbcType=DATE}  ]]>
+    </select>
+
 </mapper>

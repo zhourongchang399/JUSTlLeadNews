@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @description：TODO
  * @date ：2025/2/20 16:23
  */
-@FeignClient(value = "leadnews-article", fallback = IArticleClientFallBack.class)
+@FeignClient(value = "leadnews-article")
 public interface IArticleClient {
 
     @PostMapping("/api/v1/article/save")

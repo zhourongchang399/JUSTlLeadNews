@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.heima.api.apUser.IApUserClient;
+import com.heima.api.wemedia.IWeMediaClient;
 import com.heima.article.mapper.ApArticleConfigMapper;
 import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
@@ -22,12 +23,14 @@ import com.heima.model.article.pojos.ApArticleContent;
 import com.heima.model.article.pojos.ApCollection;
 import com.heima.model.article.vos.ApArticleBehavior;
 import com.heima.model.article.vos.ApArticleSearchVo;
+import com.heima.model.article.vos.ApHotArticleVo;
 import com.heima.model.behavior.dtos.BehaviorDto;
 import com.heima.model.behavior.pojos.Behavior;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.user.pojos.ApUserFollow;
+import com.heima.model.wemedia.pojos.WmChannel;
 import com.heima.utils.common.WmThreadLocalUtil;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +41,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author ：Zc
@@ -73,9 +78,12 @@ public class ApArticleServiceImpl implements ApArticleService {
     @Autowired
     private IApUserClient iApUserClient;
 
+    @Autowired
+    private IWeMediaClient iWeMediaClient;
+
     @Override
     @Transactional
-    public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto) {
+    public ResponseResult pageApArticle(Short type, ArticleHomeDto articleHomeDto) {
         // 数量校验
         if (articleHomeDto.getSize() == null || articleHomeDto.getSize() == 0) {
             articleHomeDto.setSize(10);
@@ -105,7 +113,7 @@ public class ApArticleServiceImpl implements ApArticleService {
         Page<ApArticle> apArticlePage = apArticleMapper.pageQueryApArticle(type, articleHomeDto);
         log.info("查询到{}条数据！{}", apArticlePage.getTotal(), apArticlePage.getResult());
 
-        return apArticlePage.getResult();
+        return ResponseResult.okResult(apArticlePage.getResult());
     }
 
     @Override
@@ -190,6 +198,52 @@ public class ApArticleServiceImpl implements ApArticleService {
 
         // 返回结果
         return ResponseResult.okResult(apArticleBehavior);
+
+    }
+
+    @Override
+    public ResponseResult pageApArticleWithHot(Short type, ArticleHomeDto articleHomeDto, boolean b) {
+        // 数量校验
+        if (articleHomeDto.getSize() == null || articleHomeDto.getSize() == 0) {
+            articleHomeDto.setSize(10);
+        }
+        articleHomeDto.setSize(Math.min(articleHomeDto.getSize(), PAGE_MAX_SIZE));
+
+        // 类型校验
+        if (!type.equals(ArticleConstants.LOADTYPE_LOAD_MORE) && !type.equals(ArticleConstants.LOADTYPE_LOAD_NEW)) {
+            type = ArticleConstants.LOADTYPE_LOAD_MORE;
+        }
+
+        // 文章频道校验
+        List<WmChannel> wmChannelList = new ArrayList<>();
+        if (articleHomeDto.getTag().isEmpty()) {
+            articleHomeDto.setTag(ArticleConstants.DEFAULT_TAG);
+        } else {
+            ResponseResult responseResult = iWeMediaClient.getWmChannel();
+            if (responseResult.getData() != null && responseResult.getCode() == 200) {
+                wmChannelList = JSON.parseArray((String) responseResult.getData(), WmChannel.class);
+            }
+            List<WmChannel> collect = wmChannelList.stream().filter(c -> String.valueOf(c.getId()).equals(articleHomeDto.getTag())).collect(Collectors.toList());
+            articleHomeDto.setTag(collect.get(0).getName());
+        }
+
+        // 时间校验
+        if (articleHomeDto.getMaxBehotTime() == null){
+            articleHomeDto.setMaxBehotTime(new Date());
+        }
+        if (articleHomeDto.getMinBehotTime() == null){
+            articleHomeDto.setMinBehotTime(new Date());
+        }
+
+        if (b) {
+            String o = String.valueOf(redisTemplate.opsForValue().get(ArticleConstants.HOT_ARTICLE_FIRST_PAGE + articleHomeDto.getTag()));
+            if (o != null && !o.equals("")) {
+                List<ApHotArticleVo> apHotArticleVos = JSON.parseArray(o, ApHotArticleVo.class);
+                return ResponseResult.okResult(apHotArticleVos);
+            }
+        }
+
+        return pageApArticle(type, articleHomeDto);
 
     }
 

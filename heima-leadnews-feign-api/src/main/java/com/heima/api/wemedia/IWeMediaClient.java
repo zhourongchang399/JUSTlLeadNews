@@ -4,13 +4,14 @@ import com.heima.model.common.dtos.ResponseResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value = "leadnews-wemedia")
-public interface IWmUserClient {
+public interface IWeMediaClient {
 
     @GetMapping("/wmUser/{id}")
     ResponseResult getWmUserInfo(@PathVariable int id);
+
+    @GetMapping("/wmChannel/getAllChannel")
+    public ResponseResult getWmChannel();
 
 }

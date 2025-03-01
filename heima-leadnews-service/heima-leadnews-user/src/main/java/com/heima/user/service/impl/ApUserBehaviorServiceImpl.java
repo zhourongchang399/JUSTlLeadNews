@@ -2,7 +2,7 @@ package com.heima.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.heima.api.wemedia.IWmUserClient;
+import com.heima.api.wemedia.IWeMediaClient;
 import com.heima.common.exception.CustomException;
 import com.heima.model.behavior.dtos.BehaviorDto;
 import com.heima.model.common.dtos.ResponseResult;
@@ -39,7 +39,7 @@ public class ApUserBehaviorServiceImpl implements ApUserBehaviorService {
     private ApUserMapper apUserMapper;
 
     @Autowired
-    private IWmUserClient wmUserClient;
+    private IWeMediaClient wmUserClient;
 
     @Override
     public ResponseResult userFollow(BehaviorDto behaviorDto) {

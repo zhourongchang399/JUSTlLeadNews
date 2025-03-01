@@ -17,11 +17,13 @@ import java.util.List;
 
 public interface ApArticleService {
 
-    public List<ApArticle> pageApArticle(Short type, ArticleHomeDto articleHomeDto);
+    ResponseResult pageApArticle(Short type, ArticleHomeDto articleHomeDto);
 
     ResponseResult saveArticle(ArticleDto articleDto);
 
     ResponseResult loadArticle();
 
     ResponseResult loadArticleBehavior(BehaviorDto behaviorDto);
+
+    ResponseResult pageApArticleWithHot(Short type, ArticleHomeDto articleHomeDto, boolean b);
 }

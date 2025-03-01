@@ -7,6 +7,9 @@ import com.heima.model.article.vos.ApArticleSearchVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -20,4 +23,5 @@ public interface ApArticleMapper {
 
     List<ApArticleSearchVo> loadArticle(@Param("articleId") Long articleId);
 
+    List<ApArticle> findAll(Date time);
 }
