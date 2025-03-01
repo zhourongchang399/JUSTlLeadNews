@@ -216,7 +216,7 @@ public class ApArticleServiceImpl implements ApArticleService {
 
         // 文章频道校验
         List<WmChannel> wmChannelList = new ArrayList<>();
-        if (articleHomeDto.getTag().isEmpty()) {
+        if (articleHomeDto.getTag().isEmpty() || articleHomeDto.getTag().equals(ArticleConstants.DEFAULT_TAG)) {
             articleHomeDto.setTag(ArticleConstants.DEFAULT_TAG);
         } else {
             ResponseResult responseResult = iWeMediaClient.getWmChannel();

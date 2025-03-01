@@ -17,8 +17,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,9 +52,8 @@ public class HotArticleServiceImpl implements HotArticleService {
      */
     @Override
     public ResponseResult searchFiveDayHotArticle() {
-        // 获取近5天的全部文章的行为信息
-        LocalDate now = LocalDate.now().minusDays(5);
-        Date date = new Date(now.toEpochDay());
+        // 获取近30天的全部文章的行为信息
+        Date date = new Date(Instant.now().minusSeconds(3600 * 24 * 30).toEpochMilli());
         List<ApArticle> apArticles = apArticleMapper.findAll(date);
         log.info(String.valueOf(apArticles.size()));
 
@@ -83,7 +84,9 @@ public class HotArticleServiceImpl implements HotArticleService {
                     .collect(Collectors.toList());
 
             // 存入redis中
-            saveHotArticlePreChannelToRedis(hotArticle4channel, hotArticle4channel.get(0).getChannelName());
+            if (hotArticle4channel != null && hotArticle4channel.size() > 0) {
+                saveHotArticlePreChannelToRedis(hotArticle4channel, hotArticle4channel.get(0).getChannelName());
+            }
         }
 
         // 计算推荐频道的热门文章（全部文章的前30）
