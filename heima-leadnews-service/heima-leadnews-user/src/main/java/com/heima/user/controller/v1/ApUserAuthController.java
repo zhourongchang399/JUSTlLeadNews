@@ -22,16 +22,37 @@ public class ApUserAuthController {
     @Autowired
     private ApUserAuthService apUserAuthService;
 
+    /**
+     * @author: Zc
+     * @description: 获取申请用户信息
+     * @date: 2025/3/3 21:41
+     * @param null
+     * @return
+     */
     @PostMapping("/list")
     public ResponseResult list(@RequestBody AuthDto authDto) {
         return apUserAuthService.list(authDto);
     }
 
+    /**
+     * @author: Zc
+     * @description: 通过申请用户
+     * @date: 2025/3/3 21:42
+     * @param null
+     * @return
+     */
     @PostMapping("/authFail")
     public ResponseResult authFail(@RequestBody AuthDto authDto) {
         return apUserAuthService.authFial(authDto);
     }
 
+    /**
+     * @author: Zc
+     * @description: 驳回申请用户
+     * @date: 2025/3/3 21:42
+     * @param null
+     * @return
+     */
     @PostMapping("/authPass")
     public ResponseResult authPass(@RequestBody AuthDto authDto) {
         return apUserAuthService.authPass(authDto);

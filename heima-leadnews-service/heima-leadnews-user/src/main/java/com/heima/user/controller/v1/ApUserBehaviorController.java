@@ -21,6 +21,13 @@ public class ApUserBehaviorController {
     @Autowired
     private ApUserBehaviorService apUserBehaviorService;
 
+    /**
+     * @author: Zc
+     * @description: 用户关注
+     * @date: 2025/3/3 21:39
+     * @param null
+     * @return
+     */
     @PostMapping("/user_follow")
     public ResponseResult userFollow(@RequestBody BehaviorDto behaviorDto) {
         return apUserBehaviorService.userFollow(behaviorDto);

@@ -21,6 +21,13 @@ public class BehaviorController {
     @Autowired
     private ApBehaviorService apBehaviorService;
 
+    /**
+     * @author: Zc
+     * @description: 收藏
+     * @date: 2025/3/3 21:35
+     * @param null
+     * @return
+     */
     @PostMapping("/collection_behavior")
     public ResponseResult collectionBehavior(@RequestBody BehaviorDto behaviorDto) {
         return apBehaviorService.collectionBehavior(behaviorDto);

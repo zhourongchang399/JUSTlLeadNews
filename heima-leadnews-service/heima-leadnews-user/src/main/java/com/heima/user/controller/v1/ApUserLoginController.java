@@ -20,6 +20,13 @@ public class ApUserLoginController {
     @Autowired
     private ApUserService apUserService;
 
+    /**
+     * @author: Zc
+     * @description: app端用户登录
+     * @date: 2025/3/3 21:41
+     * @param null
+     * @return
+     */
     @PostMapping("/login_auth")
     @ApiOperation("用户登录")
     public ResponseResult login(@RequestBody LoginDto dto){

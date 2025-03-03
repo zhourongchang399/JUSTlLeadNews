@@ -21,6 +21,14 @@ public class AdLoginController {
     @Autowired
     private AdLoginService adLoginService;
 
+
+    /**
+     * @author: Zc
+     * @description: 管理端用户登录
+     * @date: 2025/3/3 21:43
+     * @param null
+     * @return
+     */
     @PostMapping("/in")
     public ResponseResult login(@RequestBody AdUserDto adUserDto) {
         return adLoginService.adminLogin(adUserDto);

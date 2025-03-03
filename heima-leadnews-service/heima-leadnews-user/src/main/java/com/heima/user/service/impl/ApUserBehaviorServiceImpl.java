@@ -69,6 +69,14 @@ public class ApUserBehaviorServiceImpl implements ApUserBehaviorService {
         ApUser userInfo = apUserMapper.getById(userId);
 
         // 关注
+        UserfollowOrNot(behaviorDto, userId, apUser, userInfo);
+
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+
+    }
+
+    private void UserfollowOrNot(BehaviorDto behaviorDto, Integer userId, ApUser apUser, ApUser userInfo) {
+        // 关注
         if (behaviorDto.getOperation() == 0) {
 
             // 封装关注对象
@@ -108,9 +116,6 @@ public class ApUserBehaviorServiceImpl implements ApUserBehaviorService {
             queryWrapper1.eq("fans_id", userId).eq("user_id", apUser.getId());
             apUserFanMapper.delete(queryWrapper1);
         }
-
-        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
-
     }
 
     @Override

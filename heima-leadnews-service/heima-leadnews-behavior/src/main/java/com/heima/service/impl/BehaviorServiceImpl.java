@@ -2,13 +2,17 @@ package com.heima.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.heima.common.constants.BehaviorConstants;
+import com.heima.common.constants.HotArticleConstants;
 import com.heima.common.exception.CustomException;
+import com.heima.common.kafka.KafkaService;
 import com.heima.model.behavior.dtos.BehaviorDto;
 import com.heima.model.behavior.pojos.Behavior;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.mess.UpdateArticleMess;
 import com.heima.service.BehaviorService;
 import com.heima.utils.common.WmThreadLocalUtil;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,9 @@ public class BehaviorServiceImpl implements BehaviorService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     @Override
     public ResponseResult likesBehavior(BehaviorDto behaviorDto) {
@@ -54,6 +61,15 @@ public class BehaviorServiceImpl implements BehaviorService {
             // 新增行为数据
             redisTemplate.opsForHash().put(name, key, JSON.toJSONString(BehaviorObject));
         }
+
+        // 封装消息对象
+        UpdateArticleMess updateArticleMess = new UpdateArticleMess();
+        updateArticleMess.setArticleId(behaviorDto.getArticleId());
+        updateArticleMess.setType(UpdateArticleMess.UpdateArticleType.LIKES);
+        updateArticleMess.setAdd(behaviorDto.getOperation() == BehaviorConstants.LIKE ? 1 : -1);
+
+        // 发送消息到kafka以实时计算分数
+        kafkaService.sendAsync(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC,JSON.toJSONString(updateArticleMess));
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
@@ -96,6 +112,15 @@ public class BehaviorServiceImpl implements BehaviorService {
 
         // 新增行为数据
         redisTemplate.opsForHash().put(name, key, JSON.toJSONString(behaviorObject));
+
+        // 封装消息对象
+        UpdateArticleMess updateArticleMess = new UpdateArticleMess();
+        updateArticleMess.setArticleId(behaviorDto.getArticleId());
+        updateArticleMess.setType(UpdateArticleMess.UpdateArticleType.VIEWS);
+        updateArticleMess.setAdd(1);
+
+        // 发送消息到kafka以实时计算分数
+        kafkaService.sendAsync(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC,JSON.toJSONString(updateArticleMess));
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
