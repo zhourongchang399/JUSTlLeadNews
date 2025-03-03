@@ -120,7 +120,7 @@ public class BehaviorServiceImpl implements BehaviorService {
         updateArticleMess.setAdd(1);
 
         // 发送消息到kafka以实时计算分数
-        kafkaService.sendAsync(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC,JSON.toJSONString(updateArticleMess));
+        kafkaService.sendAsync(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC, JSON.toJSONString(updateArticleMess));
 
         // 返回结果
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);

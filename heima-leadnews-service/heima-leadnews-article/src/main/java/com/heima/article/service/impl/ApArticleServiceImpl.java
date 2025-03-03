@@ -29,11 +29,13 @@ import com.heima.model.behavior.pojos.Behavior;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.mess.ArticleVisitStreamMess;
 import com.heima.model.user.pojos.ApUserFollow;
 import com.heima.model.wemedia.pojos.WmChannel;
 import com.heima.utils.common.WmThreadLocalUtil;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -244,6 +247,11 @@ public class ApArticleServiceImpl implements ApArticleService {
         }
 
         return pageApArticle(type, articleHomeDto);
+
+    }
+
+    @Override
+    public void updateScore(ArticleVisitStreamMess mess) {
 
     }
 
