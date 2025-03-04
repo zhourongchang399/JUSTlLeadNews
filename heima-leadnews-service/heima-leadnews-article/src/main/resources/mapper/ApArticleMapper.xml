@@ -15,6 +15,18 @@
             <if test="staticUrl != null">
                 static_url = #{staticUrl},
             </if>
+            <if test="comment != null">
+                comment = #{comment},
+            </if>
+            <if test="views != null">
+                views = #{views},
+            </if>
+            <if test="likes != null">
+                likes = #{likes},
+            </if>
+            <if test="collection != null">
+                collection = #{collection},
+             </if>
         </set>
         where id = #{id}
     </update>

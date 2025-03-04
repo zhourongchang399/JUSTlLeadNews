@@ -83,6 +83,13 @@ public class ApArticleServiceImpl implements ApArticleService {
     @Autowired
     private IWeMediaClient iWeMediaClient;
 
+    /**
+     * @author: Zc
+     * @description: 分页查询App端文章
+     * @date: 2025/3/4 14:33
+     * @param null
+     * @return 
+     */
     @Override
     @Transactional
     public ResponseResult pageApArticle(Short type, ArticleHomeDto articleHomeDto) {
@@ -118,6 +125,13 @@ public class ApArticleServiceImpl implements ApArticleService {
         return ResponseResult.okResult(apArticlePage.getResult());
     }
 
+    /**
+     * @author: Zc
+     * @description: 保存文章
+     * @date: 2025/3/4 14:34
+     * @param null
+     * @return 
+     */
     @Override
     @Transactional
     public ResponseResult saveArticle(ArticleDto articleDto) {
@@ -156,12 +170,26 @@ public class ApArticleServiceImpl implements ApArticleService {
         return ResponseResult.okResult(articleId);
     }
 
+    /**
+     * @author: Zc
+     * @description: 加载文章
+     * @date: 2025/3/4 14:35
+     * @param null
+     * @return 
+     */
     @Override
     public ResponseResult loadArticle() {
         List<ApArticleSearchVo> apArticleSearchVoList = apArticleMapper.loadArticle(null);
         return ResponseResult.okResult(JSON.toJSONString(apArticleSearchVoList));
     }
-
+    
+    /**
+     * @author: 加载文章行为
+     * @description: TODO
+     * @date: 2025/3/4 14:35
+     * @param null
+     * @return 
+     */
     @Override
     @Transactional
     public ResponseResult loadArticleBehavior(BehaviorDto behaviorDto) {
@@ -203,6 +231,13 @@ public class ApArticleServiceImpl implements ApArticleService {
 
     }
 
+    /**
+     * @author: Zc
+     * @description: 从 Redis 中分页查询热门文章
+     * @date: 2025/3/4 14:35
+     * @param null
+     * @return
+     */
     @Override
     public ResponseResult pageApArticleWithHot(Short type, ArticleHomeDto articleHomeDto, boolean b) {
         // 数量校验
@@ -268,20 +303,20 @@ public class ApArticleServiceImpl implements ApArticleService {
         if (article == null) {
             throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
         }
-        article.setComment(article.getComment() == null ? (Math.max(mess.getComment(), 0)) : article.getComment() + mess.getComment());
-        article.setComment(article.getLikes() == null ? (Math.max(mess.getLike(), 0)) : article.getLikes() + mess.getLike());
-        article.setComment(article.getCollection() == null ? (Math.max(mess.getCollect(), 0)) : article.getCollection() + mess.getCollect());
-        article.setComment(article.getViews() == null ? (Math.max(mess.getView(), 0)) : article.getViews() + mess.getView());
-
-        // 持久化到数据库
-        apArticleMapper.updateById(article);
 
         // 计算原来的分数
         int oriScore = compScore(article.getLikes(), article.getCollection(), article.getComment(), article.getViews());
         // 计算新的行为分数
-        int laterScore = compScore(mess.getLike(), article.getCollection(), article.getComment(), article.getViews());
-        // 加总分数
-        int score = oriScore + laterScore;
+        int laterScore = compScore(mess.getLike(), mess.getCollect(), mess.getComment(), mess.getView());
+        // 加总实时分数
+        int score = oriScore + 3 * laterScore;
+
+        // 持久化到数据库
+        article.setComment(article.getComment() == null ? (Math.max(mess.getComment(), 0)) : article.getComment() + mess.getComment());
+        article.setLikes(article.getLikes() == null ? (Math.max(mess.getLike(), 0)) : article.getLikes() + mess.getLike());
+        article.setCollection(article.getCollection() == null ? (Math.max(mess.getCollect(), 0)) : article.getCollection() + mess.getCollect());
+        article.setViews(article.getViews() == null ? (Math.max(mess.getView(), 0)) : article.getViews() + mess.getView());
+        apArticleMapper.updateById(article);
 
         // 封装对象
         ApHotArticleVo newHotArticleVo = new ApHotArticleVo();
@@ -296,6 +331,13 @@ public class ApArticleServiceImpl implements ApArticleService {
 
     }
 
+    /**
+     * @author: Zc
+     * @description: 检索 Redis 中的热门文章，并更新
+     * @date: 2025/3/4 14:32
+     * @param null
+     * @return
+     */
     private void replaceOrInsertRedisHotArticle(ApArticle article, ApHotArticleVo newHotArticleVo, String channelName) {
         // 获取当前文章频道的 Redis 信息
         List<ApHotArticleVo> apHotArticleVos = new ArrayList<>();
@@ -340,23 +382,37 @@ public class ApArticleServiceImpl implements ApArticleService {
         redisTemplate.opsForValue().set(ArticleConstants.HOT_ARTICLE_FIRST_PAGE + channelName, JSON.toJSONString(apHotArticleVos));
     }
 
+    /**
+     * @author: Zc
+     * @description: 计算分数
+     * @date: 2025/3/4 14:36
+     * @param null
+     * @return
+     */
     public int compScore(Integer likes, Integer collections, Integer comments, Integer views) {
         int likeScore = 0, collectScore = 0, commentScore = 0, viewScore = 0;
         if (likes != null) {
             likeScore += likes * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
         }
         if (collections != null) {
-            collectScore += collections * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+            collectScore += collections * ArticleConstants.HOT_ARTICLE_COLLECTION_WEIGHT;
         }
         if (comments != null) {
-            commentScore += comments * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+            commentScore += comments * ArticleConstants.HOT_ARTICLE_COMMENT_WEIGHT;
         }
         if (views != null) {
-            viewScore += views * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+            viewScore += views * ArticleConstants.HOT_ARTICLE_VIEW_WEIGHT;
         }
         return likeScore + collectScore + commentScore + viewScore;
     }
 
+    /**
+     * @author: Zc
+     * @description: 编辑文章
+     * @date: 2025/3/4 14:37
+     * @param null
+     * @return
+     */
     private void modifyArticle(ArticleDto articleDto) {
         // 参数拷贝
         ApArticle apArticle = new ApArticle();
@@ -365,6 +421,13 @@ public class ApArticleServiceImpl implements ApArticleService {
         apArticleMapper.updateById(apArticle);
     }
 
+    /**
+     * @author: Zc
+     * @description: 保存文章配置
+     * @date: 2025/3/4 14:37
+     * @param null
+     * @return
+     */
     private void saveArticleConfig(Long articleId) {
         // 设置文章默认配置
         ApArticleConfig apArticleConfig = new ApArticleConfig();
@@ -377,6 +440,13 @@ public class ApArticleServiceImpl implements ApArticleService {
         apArticleConfigMapper.insert(apArticleConfig);
     }
 
+    /**
+     * @author: Zc
+     * @description: 修改文章内容
+     * @date: 2025/3/4 14:37
+     * @param null
+     * @return
+     */
     private void modifyArticleContent(ArticleDto articleDto) {
         // 参数拷贝
         ApArticleContent apArticleContent = new ApArticleContent();
@@ -386,6 +456,13 @@ public class ApArticleServiceImpl implements ApArticleService {
         apArticleContentMapper.update(apArticleContent);
     }
 
+    /**
+     * @author: Zc
+     * @description: 保存文章内容
+     * @date: 2025/3/4 14:37
+     * @param null
+     * @return
+     */
     private void saveArticleContent(ArticleDto articleDto, Long articleId) {
         // 参数拷贝
         ApArticleContent apArticleContent = new ApArticleContent();
@@ -395,6 +472,13 @@ public class ApArticleServiceImpl implements ApArticleService {
         apArticleContentMapper.insert(apArticleContent);
     }
 
+    /**
+     * @author: Zc
+     * @description: 保存文章信息
+     * @date: 2025/3/4 14:37
+     * @param null
+     * @return
+     */
     private Long saveArticleInfo(ArticleDto articleDto) {
         // 参数拷贝
         ApArticle apArticle = new ApArticle();

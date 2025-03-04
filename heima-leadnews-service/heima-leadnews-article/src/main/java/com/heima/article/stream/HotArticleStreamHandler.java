@@ -140,6 +140,5 @@ public class HotArticleStreamHandler {
         }
         log.info("聚合消息处理之后的结果为:{}",JSON.toJSONString(mess));
         return JSON.toJSONString(mess);
-
     }
 }

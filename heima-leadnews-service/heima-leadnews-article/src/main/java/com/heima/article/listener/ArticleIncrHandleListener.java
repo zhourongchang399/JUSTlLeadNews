@@ -21,7 +21,7 @@ public class ArticleIncrHandleListener {
     public void onMessage(String mess){
         if(StringUtils.isNotBlank(mess)){
             ArticleVisitStreamMess articleVisitStreamMess = JSON.parseObject(mess, ArticleVisitStreamMess.class);
-            log.info(articleVisitStreamMess.toString());
+            log.info(HotArticleConstants.HOT_ARTICLE_SCORE_TOPIC + "监听到消息：" + articleVisitStreamMess.toString());
             apArticleService.updateScore(articleVisitStreamMess);
         }
     }
