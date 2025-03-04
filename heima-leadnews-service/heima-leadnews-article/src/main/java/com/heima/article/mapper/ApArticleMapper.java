@@ -24,4 +24,6 @@ public interface ApArticleMapper {
     List<ApArticleSearchVo> loadArticle(@Param("articleId") Long articleId);
 
     List<ApArticle> findAll(Date time);
+
+    ApArticle getById(Long articleId);
 }

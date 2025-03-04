@@ -69,4 +69,9 @@
         and ap_article.publish_time >= #{time,jdbcType=DATE}  ]]>
     </select>
 
+    <select id="getById" resultType="com.heima.model.article.pojos.ApArticle">
+        select * from ap_article
+            where id = #{articleId}
+    </select>
+
 </mapper>
