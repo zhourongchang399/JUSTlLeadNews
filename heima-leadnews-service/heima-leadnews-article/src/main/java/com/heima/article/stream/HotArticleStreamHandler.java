@@ -21,7 +21,7 @@ public class HotArticleStreamHandler {
     @Bean
     public KStream<String,String> kStream(StreamsBuilder streamsBuilder){
         //接收消息
-        KStream<String,String> stream = streamsBuilder.stream(HotArticleConstants.HOT_ARTICLE_SCORE_TOPIC);
+        KStream<String,String> stream = streamsBuilder.stream(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC);
         //聚合流式处理
         stream.map((key,value)->{
                     UpdateArticleMess mess = JSON.parseObject(value, UpdateArticleMess.class);
@@ -105,11 +105,9 @@ public class HotArticleStreamHandler {
                     return new KeyValue<>(key.key().toString(),formatObj(key.key().toString(),value));
                 })
                 //发送消息
-                .to(HotArticleConstants.HOT_ARTICLE_INCR_HANDLE_TOPIC);
+                .to(HotArticleConstants.HOT_ARTICLE_SCORE_TOPIC);
 
         return stream;
-
-
     }
 
     /**

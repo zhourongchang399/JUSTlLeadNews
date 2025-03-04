@@ -14,6 +14,8 @@ import com.heima.article.service.ApArticleFreemakerService;
 import com.heima.article.service.ApArticleService;
 import com.heima.article.service.ApBehaviorService;
 import com.heima.common.constants.ArticleConstants;
+import com.heima.common.constants.BehaviorConstants;
+import com.heima.common.constants.HotArticleConstants;
 import com.heima.common.exception.CustomException;
 import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.article.dtos.ArticleHomeDto;
@@ -43,10 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -250,9 +249,112 @@ public class ApArticleServiceImpl implements ApArticleService {
 
     }
 
+    /**
+     * @author: Zc
+     * @description: 更新分数
+     * @date: 2025/3/4 13:17
+     * @param null
+     * @return
+     */
     @Override
     public void updateScore(ArticleVisitStreamMess mess) {
+        // 参数校验
+        if (mess == null || mess.getArticleId() == null || mess.getArticleId() == 0) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
 
+        // 查询文章
+        ApArticle article = apArticleMapper.getById(mess.getArticleId());
+        if (article == null) {
+            throw new CustomException(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        article.setComment(article.getComment() == null ? (Math.max(mess.getComment(), 0)) : article.getComment() + mess.getComment());
+        article.setComment(article.getLikes() == null ? (Math.max(mess.getLike(), 0)) : article.getLikes() + mess.getLike());
+        article.setComment(article.getCollection() == null ? (Math.max(mess.getCollect(), 0)) : article.getCollection() + mess.getCollect());
+        article.setComment(article.getViews() == null ? (Math.max(mess.getView(), 0)) : article.getViews() + mess.getView());
+
+        // 持久化到数据库
+        apArticleMapper.updateById(article);
+
+        // 计算原来的分数
+        int oriScore = compScore(article.getLikes(), article.getCollection(), article.getComment(), article.getViews());
+        // 计算新的行为分数
+        int laterScore = compScore(mess.getLike(), article.getCollection(), article.getComment(), article.getViews());
+        // 加总分数
+        int score = oriScore + laterScore;
+
+        // 封装对象
+        ApHotArticleVo newHotArticleVo = new ApHotArticleVo();
+        BeanUtils.copyProperties(article, newHotArticleVo);
+        newHotArticleVo.setScore(score);
+
+        // 更新当前频道的热门文章
+        replaceOrInsertRedisHotArticle(article, newHotArticleVo, article.getChannelName());
+
+        // 更新推荐频道的热门文章
+        replaceOrInsertRedisHotArticle(article, newHotArticleVo, ArticleConstants.DEFAULT_TAG);
+
+    }
+
+    private void replaceOrInsertRedisHotArticle(ApArticle article, ApHotArticleVo newHotArticleVo, String channelName) {
+        // 获取当前文章频道的 Redis 信息
+        List<ApHotArticleVo> apHotArticleVos = new ArrayList<>();
+        String hotArticleString = (String) redisTemplate.opsForValue().get(ArticleConstants.HOT_ARTICLE_FIRST_PAGE + channelName);
+        if (StringUtils.isNotBlank(hotArticleString)) {
+            apHotArticleVos = JSON.parseArray(hotArticleString, ApHotArticleVo.class);
+            // 排序
+            apHotArticleVos = apHotArticleVos.stream().sorted(Comparator.comparing(ApHotArticleVo::getScore).reversed()).collect(Collectors.toList());
+        }
+
+        // 检索是否存在
+        boolean flag = false;
+        for (ApHotArticleVo hotArticleVo : apHotArticleVos) {
+            if (hotArticleVo.getId().equals(article.getId())) {
+                // 替换当前文章
+                apHotArticleVos.remove(hotArticleVo);
+                apHotArticleVos.add(newHotArticleVo);
+                flag = true;
+                break;
+            }
+        }
+
+        if (!flag) {
+            // 判断是否小于30条
+            if (apHotArticleVos.size() < 30) {
+                apHotArticleVos.add(newHotArticleVo);
+            } else {
+                // 判断是否在 Redis 中存在低于当前分数文章
+                if (apHotArticleVos.get(apHotArticleVos.size() - 1).getScore() < newHotArticleVo.getScore()) {
+                    // 移除最低分文章
+                    apHotArticleVos.remove(apHotArticleVos.size() - 1);
+                    // 插入最新文章，并排序
+                    apHotArticleVos.add(newHotArticleVo);
+                }
+            }
+        }
+
+        // 排序
+        apHotArticleVos = apHotArticleVos.stream().sorted(Comparator.comparing(ApHotArticleVo::getScore).reversed()).collect(Collectors.toList());
+
+        // 替换 Redis 中数据
+        redisTemplate.opsForValue().set(ArticleConstants.HOT_ARTICLE_FIRST_PAGE + channelName, JSON.toJSONString(apHotArticleVos));
+    }
+
+    public int compScore(Integer likes, Integer collections, Integer comments, Integer views) {
+        int likeScore = 0, collectScore = 0, commentScore = 0, viewScore = 0;
+        if (likes != null) {
+            likeScore += likes * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+        }
+        if (collections != null) {
+            collectScore += collections * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+        }
+        if (comments != null) {
+            commentScore += comments * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+        }
+        if (views != null) {
+            viewScore += views * ArticleConstants.HOT_ARTICLE_LIKE_WEIGHT;
+        }
+        return likeScore + collectScore + commentScore + viewScore;
     }
 
     private void modifyArticle(ArticleDto articleDto) {
